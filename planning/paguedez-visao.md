@@ -16,8 +16,8 @@ Crescer depois para outros exercícios, sempre com o "pagar dez" como carro-chef
 | **Admin** | Cadastra e gerencia usuários (ativar/desativar, ver lista). |
 | **Pagador de Flecas** | Registra séries de flexões, vê recordes, taças, histórico e gráfico. |
 
-Autenticação reaproveitada do projetobase (NextAuth + credenciais). Observação: hoje o base usa
-sessão `strategy: "database"`; se a ideia é JWT puro, trocar para `strategy: "jwt"` (decisão a confirmar).
+Autenticação: NextAuth + credenciais com sessão **JWT** (decidido em 2026-10-06).
+O primeiro cadastro do sistema vira ADMIN.
 
 ## 3. Funcionalidades do MVP
 
@@ -38,7 +38,9 @@ Recorde = **maior total somado no período** (não a maior série isolada):
 | Anual | total do ano × melhor ano anterior |
 
 - Verificação feita no **servidor** a cada registro; retorna quais recordes foram batidos.
-- O primeiro registro de todos não conta como recorde (não há o que bater) — ou conta como "Recruta", a decidir.
+- O primeiro registro de todos vale a taça **"Recruta"** (decidido em 2026-10-06).
+- Sem período anterior não há recorde daquele tipo (ex.: na 1ª semana não existe recorde semanal).
+- Bater de novo no mesmo período **amplia** a taça existente em vez de criar outra.
 - Um mesmo clique pode bater vários recordes de uma vez → comemoração mostra todos.
 
 ### 3.3 Comemoração
@@ -62,14 +64,16 @@ Recorde = **maior total somado no período** (não a maior série isolada):
 - Implementado com tokens de cor (CSS variables) trocados por um atributo no `<html>`; a identidade
   visual oficial será aplicada sobre esses tokens quando for enviada.
 
-## 4. Modelo de dados (proposta — confirmar antes de alterar o schema)
+## 4. Modelo de dados
 
 ```
-User        + sexo (MASCULINO | FEMININO)
-Registro    id, userId, quantidade, feitoEm (DateTime), criadoEm
-Recorde     id, userId, tipo (DIARIO|SEMANAL|MENSAL|ANUAL), valor, periodo ("2026-10-06", "2026-W41", "2026-10", "2026"), batidoEm
-Taca        id, userId, recordeId, nivel (Int, cresce a cada conquista), tipo, valor, conquistadaEm
+User        name, email, password, sexo (MASCULINO|FEMININO), papel (ADMIN|USUARIO), ativo
+Registro    userId, quantidade, dia ("YYYY-MM-DD" Brasília), feitoEm
+Taca        userId, tipo (PRIMEIRA|DIARIO|SEMANAL|MENSAL|ANUAL), periodo, valor, nivel
 ```
+
+Não há tabela de recorde: o recorde atual é calculado a partir dos registros, e cada recorde batido
+gera uma taça (detalhes em `knowledge/domain.md` e `knowledge/database.md`).
 
 Datas calculadas no fuso **America/Sao_Paulo** (senão o "dia" vira à meia-noite UTC = 21h).
 

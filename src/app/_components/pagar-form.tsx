@@ -1,0 +1,139 @@
+"use client"
+
+import { useState, useTransition } from "react"
+import { toast } from "sonner"
+import { Loader2, Minus, Plus } from "lucide-react"
+import { pagarFlecas } from "@/app/_actions/flexoes"
+import { Celebracao, type ConquistaCelebrada } from "@/components/celebracao"
+import { NOME_TIPO_TACA } from "@/lib/tacas"
+
+const ATALHOS = [10, 20, 30, 50]
+
+export function PagarForm() {
+  const [quantidade, setQuantidade] = useState("10")
+  const [pendente, iniciar] = useTransition()
+  const [conquistas, setConquistas] = useState<ConquistaCelebrada[]>([])
+
+  const ajustar = (delta: number) =>
+    setQuantidade((q) => String(Math.min(1000, Math.max(1, (Number(q) || 0) + delta))))
+
+  const pagar = () => {
+    const numero = Number(quantidade)
+    iniciar(async () => {
+      const resultado = await pagarFlecas(numero)
+      if (resultado.erro !== null) {
+        toast.error(resultado.erro)
+        return
+      }
+
+      const hoje = resultado.resumo.find((r) => r.tipo === "DIARIO")?.atual ?? numero
+      const novas = resultado.conquistas.filter((c) => c.nova)
+      const ampliadas = resultado.conquistas.filter((c) => !c.nova)
+
+      if (novas.length > 0) {
+        setConquistas(novas)
+      } else if (ampliadas.length > 0) {
+        toast.success(`${NOME_TIPO_TACA[ampliadas[ampliadas.length - 1].tipo]} ampliado: ${hoje} flecas hoje!`)
+      } else {
+        toast.success(`+${numero} flecas pagas! Hoje: ${hoje}`)
+      }
+    })
+  }
+
+  return (
+    <>
+      <form
+        className="flex flex-col items-center"
+        onSubmit={(e) => {
+          e.preventDefault()
+          pagar()
+        }}
+      >
+        <div className="relative w-full text-center">
+          {/* Adesivos decorativos */}
+          <span
+            aria-hidden="true"
+            className="display absolute -top-3 left-0 flex h-12 w-12 rotate-[-14deg] items-center justify-center rounded-full border border-black bg-[var(--sol)] text-xl"
+          >
+            10
+          </span>
+          <span
+            aria-hidden="true"
+            className="rotulo absolute -top-1 right-0 rotate-[9deg] rounded-full border border-black bg-[var(--menta)] px-3 py-1.5"
+          >
+            Selva!
+          </span>
+          <h1 className="display pt-6 text-[48px] sm:text-[64px]">
+            Quantas
+            <br />
+            flecas?
+          </h1>
+        </div>
+
+        <div className="adesivo mt-6 flex w-full items-center justify-between gap-2 p-3">
+          <button
+            type="button"
+            onClick={() => ajustar(-1)}
+            className="pilula pilula-fantasma h-14 w-14 shrink-0 !p-0"
+            aria-label="Diminuir"
+          >
+            <Minus className="h-6 w-6" />
+          </button>
+          <input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={1000}
+            required
+            value={quantidade}
+            onChange={(e) => setQuantidade(e.target.value)}
+            onFocus={(e) => e.target.select()}
+            className="display w-full min-w-0 bg-transparent text-center text-[72px] outline-none"
+            aria-label="Quantidade de flexões"
+          />
+          <button
+            type="button"
+            onClick={() => ajustar(1)}
+            className="pilula pilula-fantasma h-14 w-14 shrink-0 !p-0"
+            aria-label="Aumentar"
+          >
+            <Plus className="h-6 w-6" />
+          </button>
+        </div>
+
+        <div className="mt-3 flex justify-center gap-2">
+          {ATALHOS.map((n) => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setQuantidade(String(n))}
+              className={`pilula ${quantidade === String(n) ? "pilula-cheia" : "pilula-fantasma"} min-w-14`}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+
+        {/* Botão principal: círculo preto sobre um disco da cor do tema (azul/rosa) */}
+        <div className="mt-10 rounded-full border border-black bg-[var(--marca)] p-4">
+          <button
+            type="submit"
+            disabled={pendente}
+            className="botao-pagar flex h-48 w-48 flex-col items-center justify-center rounded-full disabled:opacity-80"
+          >
+            {pendente ? (
+              <Loader2 className="h-12 w-12 animate-spin" />
+            ) : (
+              <>
+                <span className="display text-[38px]">Paguei!</span>
+                <span className="rotulo mt-2 opacity-70">registrar</span>
+              </>
+            )}
+          </button>
+        </div>
+      </form>
+
+      <Celebracao conquistas={conquistas} aoFechar={() => setConquistas([])} />
+    </>
+  )
+}

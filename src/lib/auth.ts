@@ -1,214 +1,86 @@
-import NextAuth, { DefaultSession, type User } from "next-auth"
-import type { JWT } from "next-auth/jwt"
-import prisma from "./prisma"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import type { Adapter, AdapterUser } from "next-auth/adapters"
-import GitHub from "next-auth/providers/github"
-import Google from "next-auth/providers/google"
+import NextAuth, { DefaultSession } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
+import { z } from "zod"
+import prisma from "./prisma"
 
 export const runtime = "nodejs"
+
+export type PapelUsuario = "ADMIN" | "USUARIO"
+export type SexoUsuario = "MASCULINO" | "FEMININO"
 
 declare module "next-auth" {
   interface Session {
     user: {
       id: string
-      role: string
-      lojaId: string | null
+      papel: PapelUsuario
+      sexo: SexoUsuario
     } & DefaultSession["user"]
   }
-}
 
-declare module "next-auth/jwt" {
-  interface JWT {
-    role?: string
-    lojaId?: string | null
+  interface User {
+    papel?: PapelUsuario
+    sexo?: SexoUsuario
   }
 }
 
-function customAdapter(p: typeof prisma): Adapter {
-  const baseAdapter = PrismaAdapter(p)
-
-  return {
-    ...baseAdapter,
-
-    async getUserByAccount(account) {
-      const dbAccount = await p.account.findUnique({
-        where: {
-          provider_providerAccountId: {
-            provider: account.provider,
-            providerAccountId: account.providerAccountId,
-          },
-        },
-        include: { user: true },
-      })
-
-      if (!dbAccount) return null
-
-      if (!dbAccount.user) {
-        await p.account.delete({
-          where: {
-            provider_providerAccountId: {
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
-            },
-          },
-        })
-        return null
-      }
-
-      return dbAccount.user as unknown as AdapterUser
-    },
-
-    async getUserByEmail(email) {
-      const user = await p.user.findUnique({ where: { email } })
-      if (!user) return null
-      return user as unknown as AdapterUser
-    },
-
-    async linkAccount(account) {
-      const existing = await p.account.findUnique({
-        where: {
-          provider_providerAccountId: {
-            provider: account.provider,
-            providerAccountId: account.providerAccountId,
-          },
-        },
-      })
-
-      if (existing) return
-
-      await p.account.create({ data: account })
-
-      await p.user.update({
-        where: { id: account.userId },
-        data: { emailVerified: new Date() },
-      })
-    },
-
-    async createSession(session) {
-      return p.session.create({ data: session })
-    },
-
-    async getSessionAndUser(sessionToken) {
-      const result = await p.session.findUnique({
-        where: { sessionToken },
-        include: { user: true },
-      })
-
-      if (!result) return null
-
-      const { user, ...session } = result
-      return { user: user as unknown as AdapterUser, session }
-    },
-
-    async updateSession(session) {
-      return p.session.update({
-        where: { sessionToken: session.sessionToken! },
-        data: session,
-      })
-    },
-
-    async deleteSession(sessionToken) {
-      await p.session.delete({ where: { sessionToken } })
-    },
-  } as Adapter
-}
+const credenciaisSchema = z.object({
+  email: z.string().email().toLowerCase().trim(),
+  password: z.string().min(1),
+})
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: customAdapter(prisma),
   trustHost: true,
 
+  // Sessão em JWT: nenhum acesso ao banco para validar a sessão a cada requisição.
   session: {
-    strategy: "database",
-    maxAge: 30 * 24 * 60 * 60,
-    updateAge: 24 * 60 * 60,
-  },
-
-  cookies: {
-    pkceCodeVerifier: {
-      name: "next-auth.pkce.code_verifier",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
+    strategy: "jwt",
+    maxAge: 60 * 24 * 60 * 60, // 60 dias — app de uso diário, sem ficar pedindo login
   },
 
   providers: [
-    Google({ allowDangerousEmailAccountLinking: true }),
-    GitHub({ allowDangerousEmailAccountLinking: true }),
     Credentials({
-      name: "credentials",
       credentials: {
-        username: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { label: "Email", type: "email" },
+        password: { label: "Senha", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) return null
+        const dados = credenciaisSchema.safeParse(credentials)
+        if (!dados.success) return null
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.username as string },
-        })
+        const user = await prisma.user.findUnique({ where: { email: dados.data.email } })
+        if (!user || !user.ativo) return null
 
-        if (!user || !user.password) return null
-
-        if (!user.emailVerified) {
-          throw new Error("EMAIL_NOT_VERIFIED")
-        }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        )
-
-        if (!isPasswordValid) return null
+        const senhaOk = await bcrypt.compare(dados.data.password, user.password)
+        if (!senhaOk) return null
 
         return {
           id: user.id,
           name: user.name,
           email: user.email,
-          image: user.image,
-        } as User
+          papel: user.papel,
+          sexo: user.sexo,
+        }
       },
     }),
   ],
 
   callbacks: {
-    async session({ session, user }) {
+    async jwt({ token, user }) {
       if (user) {
-        session.user.id = user.id
-
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { role: true, lojaId: true },
-        })
-
-        session.user.role = dbUser?.role ?? "LOJISTA"
-        session.user.lojaId = dbUser?.lojaId ?? null
+        token.id = user.id
+        token.papel = user.papel
+        token.sexo = user.sexo
       }
-
-      return session
+      return token
     },
 
-    async signIn({ user, account }) {
-      if (account?.provider !== "credentials") {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        })
-
-        if (existingUser && !existingUser.emailVerified) {
-          await prisma.user.update({
-            where: { id: existingUser.id },
-            data: { emailVerified: new Date() },
-          })
-        }
-      }
-
-      return true
+    async session({ session, token }) {
+      // next-auth/jwt não é resolvível para module augmentation no beta 30; tipamos aqui.
+      session.user.id = (token.id as string | undefined) ?? ""
+      session.user.papel = (token.papel as PapelUsuario | undefined) ?? "USUARIO"
+      session.user.sexo = (token.sexo as SexoUsuario | undefined) ?? "MASCULINO"
+      return session
     },
   },
 
@@ -216,3 +88,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/login",
   },
 })
+
+// Dados frescos do banco (papel/sexo/ativo podem mudar depois do login).
+// Retorna null se não houver sessão ou se o usuário foi desativado.
+export async function usuarioAtual() {
+  const session = await auth()
+  if (!session?.user?.id) return null
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { id: true, name: true, email: true, papel: true, sexo: true, ativo: true },
+  })
+  if (!user || !user.ativo) return null
+  return user
+}

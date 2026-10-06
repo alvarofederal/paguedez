@@ -28,6 +28,8 @@ const nextConfig: NextConfig = {
               "font-src 'self'",
               "img-src 'self' data: blob:",
               "connect-src 'self'",
+              // canvas-confetti desenha os confetes num Web Worker criado a partir de blob:
+              "worker-src 'self' blob:",
               "base-uri 'self'",
               "form-action 'self'",
               "upgrade-insecure-requests",

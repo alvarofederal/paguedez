@@ -45,7 +45,7 @@ export default async function UsuariosPage() {
                   {u._count.registros} séries · {u._count.tacas} taças
                 </p>
               </div>
-              {u.id !== usuario.id && <AcoesUsuario userId={u.id} ativo={u.ativo} admin={u.papel === "ADMIN"} />}
+              {u.papel !== "ADMIN" && <AcoesUsuario userId={u.id} ativo={u.ativo} />}
             </div>
           </li>
         ))}

@@ -70,7 +70,7 @@ export async function registrarSerie(userId: string, quantidade: number, agora =
 
   return prisma.$transaction(
     async (tx) => {
-      await tx.registro.create({ data: { userId, quantidade, dia, feitoEm: agora } })
+      const registro = await tx.registro.create({ data: { userId, quantidade, dia, feitoEm: agora } })
 
       const conquistas: Conquista[] = []
 
@@ -87,7 +87,7 @@ export async function registrarSerie(userId: string, quantidade: number, agora =
       const dias = await totaisPorDia(tx, userId)
       conquistas.push(...(await sincronizarTacas(tx, userId, avaliarRecordes(dias, dia))))
 
-      return { conquistas, resumo: resumirPeriodos(dias, dia) }
+      return { registroId: registro.id, conquistas, resumo: resumirPeriodos(dias, dia) }
     },
     { timeout: 20_000 }
   )

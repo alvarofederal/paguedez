@@ -8,12 +8,11 @@
 ## Server Actions (`src/app/_actions`)
 | Action | Quem | Entrada | Retorno |
 |--------|------|---------|---------|
-| `pagarFlecas` | logado | `quantidade` (1–1000) | `{ erro, conquistas[], resumo[] }` |
-| `apagarSerie` | logado (dono) | `registroId` — só de hoje | `{ erro }` |
+| `pagarFlecas` | logado | `quantidade` (1–1000) | `{ erro, registroId, conquistas[], resumo[] }` |
+| `apagarSerie` | logado (dono) | `registroId` — só de hoje (usada pelo "Desfazer" e pela lixeira) | `{ erro }` |
 | `cadastrar` | público | name, email, password (≥6), sexo | `{ erro, id? }` |
-| `adminCriarUsuario` | ADMIN | + papel | `{ erro, id? }` |
-| `adminAlternarAtivo` | ADMIN | userId (não a si mesmo) | `{ erro }` |
-| `adminAlternarPapel` | ADMIN | userId (não a si mesmo) | `{ erro }` |
+| `adminCriarUsuario` | ADMIN | name, email, password, sexo | `{ erro, id? }` |
+| `adminAlternarAtivo` | ADMIN | userId (o admin nunca pode ser desativado) | `{ erro }` |
 | `sair` | logado | — | redireciona para `/login` |
 
 `conquistas[]`: `{ tipo, periodo, valor, nivel, nova }` — `nova=false` quando só ampliou um recorde já batido no período.

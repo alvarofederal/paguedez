@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Acesse http://localhost:3000, crie sua conta em **/cadastro** — o primeiro cadastro vira administrador.
+Acesse http://localhost:3000, crie sua conta em **/cadastro**. Apenas o email definido em `src/lib/admin.ts` vira administrador.
 
 ## Variáveis de ambiente (`.env`)
 

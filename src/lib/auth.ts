@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
 import prisma from "./prisma"
+import { papelPorEmail } from "./admin"
 
 export const runtime = "nodejs"
 
@@ -58,7 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: user.id,
           name: user.name,
           email: user.email,
-          papel: user.papel,
+          papel: papelPorEmail(user.email),
           sexo: user.sexo,
         }
       },
@@ -89,16 +90,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
 })
 
-// Dados frescos do banco (papel/sexo/ativo podem mudar depois do login).
+// Dados frescos do banco (sexo/ativo podem mudar depois do login).
 // Retorna null se não houver sessão ou se o usuário foi desativado.
+// O papel vem SEMPRE do email (só existe um admin), nunca da coluna do banco.
 export async function usuarioAtual() {
   const session = await auth()
   if (!session?.user?.id) return null
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, name: true, email: true, papel: true, sexo: true, ativo: true },
+    select: { id: true, name: true, email: true, sexo: true, ativo: true },
   })
   if (!user || !user.ativo) return null
-  return user
+  return { ...user, papel: papelPorEmail(user.email) }
 }

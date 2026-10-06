@@ -35,7 +35,8 @@ Stack: Next.js 16 (App Router) + TypeScript + MySQL (Prisma 5) + NextAuth v5 (Cr
 5. **Uma taça por (usuário, tipo, período)**; ampliar o recorde no mesmo período atualiza o valor, não cria outra.
 6. Sempre `import prisma from "@/lib/prisma"` e `usuarioAtual()` de `@/lib/auth` (busca papel/sexo/ativo frescos no banco).
 7. Sempre validar entrada com Zod (`src/lib/validators.ts`) nas Server Actions.
-8. Visual segue `context/design.md` (estilo slush.app): tokens de `globals.css`, contorno preto, pílulas, **sem gradiente nem sombra**. Tema azul/rosa por `data-sexo` no `<html>`.
+8. **Só existe UM admin**: `EMAIL_ADMIN` em `src/lib/admin.ts`. O papel é derivado do email, nunca da coluna do banco; não criar telas/ações para promover outros admins.
+9. Visual segue `context/design.md` (estilo slush.app): tokens de `globals.css`, contorno preto, pílulas, **sem gradiente nem sombra**. Tema azul/rosa por `data-sexo` no `<html>`.
 
 ## Padrão de Server Action
 
@@ -58,7 +59,7 @@ npm run build      # prisma generate + db push + next build
 
 | Rota | Descrição |
 |------|-----------|
-| `/login`, `/cadastro` | Acesso (o primeiro cadastro do sistema vira ADMIN) |
+| `/login`, `/cadastro` | Acesso (só o email do dono, em `src/lib/admin.ts`, vira ADMIN) |
 | `/` | Campo de quantidade + botão PAGUEI! + placar do dia/semana/mês/ano |
 | `/historico` | Recordes atuais, gráfico de 30 dias, galeria de taças, últimas séries |
-| `/admin/usuarios` | Admin: cadastrar, ativar/desativar, promover usuários |
+| `/admin/usuarios` | Admin: cadastrar e ativar/desativar usuários (não há promoção a admin) |

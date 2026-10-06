@@ -1,7 +1,7 @@
 # Roadmap — Pague Dez
 
 ## MVP (v0.1) — em andamento
-- [x] Login/cadastro com JWT (primeiro cadastro vira ADMIN)
+- [x] Login/cadastro com JWT (só o email do dono vira ADMIN)
 - [x] Admin: cadastrar, ativar/desativar, promover usuários
 - [x] Registro de flexões com botão PAGUEI!
 - [x] Recordes diário, semanal, mensal e anual

@@ -26,6 +26,6 @@
      Bronze (0), Prata (3), Ouro (7), Platina (12), Diamante (18), Lendária (26).
    - Ouro+ ganha estrela; Diamante+ ganha joias; Lendária ganha coroa.
 
-## Exclusão de série
-- Só séries **de hoje** (corrigir digitação).
+## Exclusão de série ("o guerreiro errou")
+- Só séries **de hoje**. Três caminhos: botão **Desfazer** no aviso (8s) após registrar, link **"Errei o número, desfazer"** na tela de comemoração, e a lixeira em "Séries de hoje".
 - Após excluir, as taças do período atual são recalculadas: se deixou de ser recorde, a taça é removida.

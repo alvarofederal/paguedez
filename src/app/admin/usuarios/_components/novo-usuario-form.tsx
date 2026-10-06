@@ -13,7 +13,6 @@ export function NovoUsuarioForm() {
   const [aberto, setAberto] = useState(false)
   const [carregando, setCarregando] = useState(false)
   const [sexo, setSexo] = useState<Sexo | null>(null)
-  const [admin, setAdmin] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
 
   if (!aberto) {
@@ -37,7 +36,6 @@ export function NovoUsuarioForm() {
       email: String(form.get("email") ?? ""),
       password: String(form.get("password") ?? ""),
       sexo,
-      papel: admin ? "ADMIN" : "USUARIO",
     })
     setCarregando(false)
 
@@ -48,17 +46,12 @@ export function NovoUsuarioForm() {
     toast.success("Usuário cadastrado!")
     formRef.current?.reset()
     setSexo(null)
-    setAdmin(false)
     setAberto(false)
   }
 
   return (
     <form ref={formRef} onSubmit={enviar} className="adesivo-grande space-y-4 bg-white p-5">
       <CamposUsuario sexo={sexo} aoMudarSexo={setSexo} />
-      <label className="ml-4 flex items-center gap-2 text-sm font-bold">
-        <input type="checkbox" checked={admin} onChange={(e) => setAdmin(e.target.checked)} className="h-4 w-4 accent-black" />
-        Administrador
-      </label>
       <div className="flex gap-2">
         <button
           type="button"

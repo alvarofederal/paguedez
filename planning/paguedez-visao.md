@@ -17,7 +17,7 @@ Crescer depois para outros exercícios, sempre com o "pagar dez" como carro-chef
 | **Pagador de Flecas** | Registra séries de flexões, vê recordes, taças, histórico e gráfico. |
 
 Autenticação: NextAuth + credenciais com sessão **JWT** (decidido em 2026-10-06).
-O primeiro cadastro do sistema vira ADMIN.
+Só o email do dono (`src/lib/admin.ts`) vira ADMIN.
 
 ## 3. Funcionalidades do MVP
 

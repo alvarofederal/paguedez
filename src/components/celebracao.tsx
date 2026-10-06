@@ -30,9 +30,11 @@ function soltarConfetes() {
 export function Celebracao({
   conquistas,
   aoFechar,
+  aoDesfazer,
 }: {
   conquistas: ConquistaCelebrada[]
   aoFechar: () => void
+  aoDesfazer?: () => void // registro errado? desfaz e some com a taça
 }) {
   const aberta = conquistas.length > 0
   // A maior conquista (último nível) é a estrela da festa
@@ -112,6 +114,11 @@ export function Celebracao({
             <button onClick={aoFechar} className="pilula pilula-cheia mt-5 w-full !py-4 text-base" autoFocus>
               SELVA!
             </button>
+            {aoDesfazer && (
+              <button onClick={aoDesfazer} className="mt-3 text-sm font-bold underline underline-offset-4">
+                Errei o número, desfazer
+              </button>
+            )}
           </motion.div>
         </motion.div>
       )}

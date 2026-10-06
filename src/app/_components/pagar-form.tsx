@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Loader2, Minus, Plus } from "lucide-react"
-import { pagarFlecas } from "@/app/_actions/flexoes"
+import { apagarSerie, pagarFlecas } from "@/app/_actions/flexoes"
 import { Celebracao, type ConquistaCelebrada } from "@/components/celebracao"
 import { NOME_TIPO_TACA } from "@/lib/tacas"
 
@@ -13,9 +13,17 @@ export function PagarForm() {
   const [quantidade, setQuantidade] = useState("10")
   const [pendente, iniciar] = useTransition()
   const [conquistas, setConquistas] = useState<ConquistaCelebrada[]>([])
+  const [ultimoRegistro, setUltimoRegistro] = useState<{ id: string; quantidade: number } | null>(null)
 
   const ajustar = (delta: number) =>
     setQuantidade((q) => String(Math.min(1000, Math.max(1, (Number(q) || 0) + delta))))
+
+  // Digitou errado? Apaga a série recém-registrada (e as taças que ela tenha gerado)
+  const desfazer = async (registro: { id: string; quantidade: number }) => {
+    const { erro } = await apagarSerie(registro.id)
+    if (erro) toast.error(erro)
+    else toast.success(`Registro de ${registro.quantidade} flecas desfeito`)
+  }
 
   const pagar = () => {
     const numero = Number(quantidade)
@@ -26,18 +34,29 @@ export function PagarForm() {
         return
       }
 
+      const registro = { id: resultado.registroId, quantidade: numero }
+      const opcoesToast = {
+        duration: 8000,
+        action: { label: "Desfazer", onClick: () => desfazer(registro) },
+      }
       const hoje = resultado.resumo.find((r) => r.tipo === "DIARIO")?.atual ?? numero
       const novas = resultado.conquistas.filter((c) => c.nova)
       const ampliadas = resultado.conquistas.filter((c) => !c.nova)
 
       if (novas.length > 0) {
+        setUltimoRegistro(registro)
         setConquistas(novas)
       } else if (ampliadas.length > 0) {
-        toast.success(`${NOME_TIPO_TACA[ampliadas[ampliadas.length - 1].tipo]} ampliado: ${hoje} flecas hoje!`)
+        toast.success(`${NOME_TIPO_TACA[ampliadas[ampliadas.length - 1].tipo]} ampliado: ${hoje} flecas hoje!`, opcoesToast)
       } else {
-        toast.success(`+${numero} flecas pagas! Hoje: ${hoje}`)
+        toast.success(`+${numero} flecas pagas! Hoje: ${hoje}`, opcoesToast)
       }
     })
+  }
+
+  const fecharCelebracao = () => {
+    setConquistas([])
+    setUltimoRegistro(null)
   }
 
   return (
@@ -133,7 +152,19 @@ export function PagarForm() {
         </div>
       </form>
 
-      <Celebracao conquistas={conquistas} aoFechar={() => setConquistas([])} />
+      <Celebracao
+        conquistas={conquistas}
+        aoFechar={fecharCelebracao}
+        aoDesfazer={
+          ultimoRegistro
+            ? () => {
+                const registro = ultimoRegistro
+                fecharCelebracao()
+                desfazer(registro)
+              }
+            : undefined
+        }
+      />
     </>
   )
 }

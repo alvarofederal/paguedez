@@ -7,10 +7,11 @@ Uso em segundos: abrir → número → **PAGUEI!** → (talvez) comemorar um rec
 ## Atores
 | Ator | Papel no banco | O que faz |
 |------|----------------|-----------|
-| Admin | `ADMIN` | Cadastra usuários, ativa/desativa, promove a admin. Também paga flecas. |
+| Admin | `ADMIN` | Cadastra usuários e ativa/desativa. Nunca pode ser desativado. Também paga flecas. |
 | Pagador de Flecas | `USUARIO` | Registra séries, vê placar, recordes, taças, histórico e gráfico. |
 
-O **primeiro cadastro** do sistema vira `ADMIN` automaticamente.
+**Só existe um admin**: o dono do produto, identificado pelo email em `src/lib/admin.ts`. O papel é sempre derivado do email
+(a coluna `papel` é só espelho) e não há como promover outros usuários.
 
 ## Stack
 - Next.js 16 (App Router, Server Components, Server Actions)

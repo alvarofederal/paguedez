@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import prisma from "@/lib/prisma"
 import { usuarioAtual } from "@/lib/auth"
+import { EMAIL_ADMIN } from "@/lib/admin"
 import { novoUsuarioSchema, type NovoUsuario } from "@/lib/validators"
 import { criarUsuario } from "@/server/usuarios"
 
@@ -18,42 +19,25 @@ async function exigirAdmin() {
   return user?.papel === "ADMIN" ? user : null
 }
 
-export async function adminCriarUsuario(dados: NovoUsuario & { papel: "ADMIN" | "USUARIO" }) {
+export async function adminCriarUsuario(dados: NovoUsuario) {
   if (!(await exigirAdmin())) return { erro: "Acesso negado" }
 
   const valido = novoUsuarioSchema.safeParse(dados)
   if (!valido.success) return { erro: valido.error.issues[0].message }
 
-  const resultado = await criarUsuario(valido.data, dados.papel === "ADMIN" ? "ADMIN" : "USUARIO")
+  const resultado = await criarUsuario(valido.data)
   revalidatePath("/admin/usuarios")
   return resultado
 }
 
 export async function adminAlternarAtivo(userId: string) {
-  const admin = await exigirAdmin()
-  if (!admin) return { erro: "Acesso negado" }
-  if (admin.id === userId) return { erro: "Você não pode desativar a si mesmo" }
+  if (!(await exigirAdmin())) return { erro: "Acesso negado" }
 
-  const alvo = await prisma.user.findUnique({ where: { id: userId }, select: { ativo: true } })
+  const alvo = await prisma.user.findUnique({ where: { id: userId }, select: { ativo: true, email: true } })
   if (!alvo) return { erro: "Usuário não encontrado" }
+  if (alvo.email === EMAIL_ADMIN) return { erro: "O administrador não pode ser desativado" }
 
   await prisma.user.update({ where: { id: userId }, data: { ativo: !alvo.ativo } })
-  revalidatePath("/admin/usuarios")
-  return { erro: null }
-}
-
-export async function adminAlternarPapel(userId: string) {
-  const admin = await exigirAdmin()
-  if (!admin) return { erro: "Acesso negado" }
-  if (admin.id === userId) return { erro: "Você não pode alterar o próprio papel" }
-
-  const alvo = await prisma.user.findUnique({ where: { id: userId }, select: { papel: true } })
-  if (!alvo) return { erro: "Usuário não encontrado" }
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: { papel: alvo.papel === "ADMIN" ? "USUARIO" : "ADMIN" },
-  })
   revalidatePath("/admin/usuarios")
   return { erro: null }
 }

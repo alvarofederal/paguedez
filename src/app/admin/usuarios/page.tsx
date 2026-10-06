@@ -42,8 +42,13 @@ export default async function UsuariosPage() {
                 </p>
                 <p className="truncate text-sm text-[var(--texto-3)]">{u.email}</p>
                 <p className="mt-1 text-xs font-bold">
-                  {u._count.registros} séries · {u._count.tacas} taças
+                  {u._count.registros} séries · {u._count.tacas} taças · maior série: {u.maiorSerie}
                 </p>
+                {u.suspeito && (
+                  <p className="rotulo mt-1 inline-block rounded-full border border-black bg-[var(--brasa)] px-2 py-0.5 !text-[10px] text-white">
+                    ⚠ Série suspeita
+                  </p>
+                )}
               </div>
               {u.papel !== "ADMIN" && <AcoesUsuario userId={u.id} ativo={u.ativo} />}
             </div>

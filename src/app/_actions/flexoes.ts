@@ -7,12 +7,16 @@ import { excluirSerie, registrarSerie } from "@/server/flexoes"
 
 export async function pagarFlecas(quantidade: number) {
   const user = await usuarioAtual()
-  if (!user) return { erro: "Sessão expirada. Entre novamente." } as const
+  if (!user) return { erro: "Sessão expirada. Entre novamente.", esperarSegundos: 0 } as const
 
   const dados = quantidadeSchema.safeParse(quantidade)
-  if (!dados.success) return { erro: dados.error.issues[0].message } as const
+  if (!dados.success) return { erro: dados.error.issues[0].message, esperarSegundos: 0 } as const
 
   const resultado = await registrarSerie(user.id, dados.data)
+  if (resultado.bloqueio) {
+    return { erro: resultado.bloqueio.mensagem, esperarSegundos: resultado.bloqueio.esperarSegundos ?? 0 } as const
+  }
+
   revalidatePath("/")
   revalidatePath("/historico")
   return { erro: null, ...resultado } as const

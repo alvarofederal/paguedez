@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Loader2, Minus, Plus } from "lucide-react"
 import { apagarSerie, pagarFlecas } from "@/app/_actions/flexoes"
 import { Celebracao, type ConquistaCelebrada } from "@/components/celebracao"
 import { NOME_TIPO_TACA } from "@/lib/tacas"
+import { LIMITES } from "@/lib/limites"
 
 const ATALHOS = [10, 20, 30, 50]
 
@@ -15,8 +16,16 @@ export function PagarForm() {
   const [conquistas, setConquistas] = useState<ConquistaCelebrada[]>([])
   const [ultimoRegistro, setUltimoRegistro] = useState<{ id: string; quantidade: number } | null>(null)
 
+  // Contagem regressiva do botão. O servidor é quem manda; isto só evita cliques inúteis.
+  const [restante, setRestante] = useState(0)
+  useEffect(() => {
+    if (restante <= 0) return
+    const t = setTimeout(() => setRestante((r) => r - 1), 1000)
+    return () => clearTimeout(t)
+  }, [restante])
+
   const ajustar = (delta: number) =>
-    setQuantidade((q) => String(Math.min(1000, Math.max(1, (Number(q) || 0) + delta))))
+    setQuantidade((q) => String(Math.min(LIMITES.maxPorSerie, Math.max(1, (Number(q) || 0) + delta))))
 
   // Digitou errado? Apaga a série recém-registrada (e as taças que ela tenha gerado)
   const desfazer = async (registro: { id: string; quantidade: number }) => {
@@ -27,12 +36,16 @@ export function PagarForm() {
 
   const pagar = () => {
     const numero = Number(quantidade)
+    if (numero > LIMITES.confirmarAcima && !confirm(`Foram mesmo ${numero} flecas de uma vez?`)) return
+
     iniciar(async () => {
       const resultado = await pagarFlecas(numero)
       if (resultado.erro !== null) {
         toast.error(resultado.erro)
+        if (resultado.esperarSegundos > 0) setRestante(resultado.esperarSegundos)
         return
       }
+      setRestante(LIMITES.intervaloMinimoSeg)
 
       const registro = { id: resultado.registroId, quantidade: numero }
       const opcoesToast = {
@@ -102,7 +115,7 @@ export function PagarForm() {
             type="number"
             inputMode="numeric"
             min={1}
-            max={1000}
+            max={LIMITES.maxPorSerie}
             required
             value={quantidade}
             onChange={(e) => setQuantidade(e.target.value)}
@@ -137,11 +150,16 @@ export function PagarForm() {
         <div className="mt-10 rounded-full border border-black bg-[var(--marca)] p-4">
           <button
             type="submit"
-            disabled={pendente}
+            disabled={pendente || restante > 0}
             className="botao-pagar flex h-48 w-48 flex-col items-center justify-center rounded-full disabled:opacity-80"
           >
             {pendente ? (
               <Loader2 className="h-12 w-12 animate-spin" />
+            ) : restante > 0 ? (
+              <>
+                <span className="display text-[56px]">{restante >= 60 ? `${Math.floor(restante / 60)}:${String(restante % 60).padStart(2, "0")}` : restante}</span>
+                <span className="rotulo mt-1 opacity-70">descansando</span>
+              </>
             ) : (
               <>
                 <span className="display text-[38px]">Paguei!</span>

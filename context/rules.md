@@ -9,6 +9,7 @@
 - Cores apenas via tokens CSS de `globals.css`.
 
 ## Nunca
+- Nunca confiar só no front-end para limitar registros: toda trava vale no servidor (`src/lib/limites.ts`).
 - Nunca alterar `prisma/schema.prisma` sem confirmar com o usuário.
 - Nunca calcular "dia" com UTC — use `diaBrasilia()`.
 - Nunca permitir apagar séries de dias anteriores (o histórico e as taças passadas são imutáveis).

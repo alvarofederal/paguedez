@@ -26,6 +26,20 @@
      Bronze (0), Prata (3), Ouro (7), Platina (12), Diamante (18), Lendária (26).
    - Ouro+ ganha estrela; Diamante+ ganha joias; Lendária ganha coroa.
 
+## Travas anti-sacanagem (`src/lib/limites.ts`)
+Aplicadas **no servidor**, dentro da transação de `registrarSerie` (com `SELECT ... FOR UPDATE` na linha do usuário, para que
+cliques simultâneos entrem um de cada vez). Os números ficam todos em `LIMITES` — é o único lugar para ajustar.
+
+| Regra | Valor |
+|-------|-------|
+| Intervalo mínimo entre registros | 15 s |
+| Máx. de registros na janela deslizante | 2 a cada 3 min |
+| Teto de uma série | 200 (acima de 100 o app pergunta "foram mesmo N?") |
+| Teto diário | 20 registros e 1000 flecas |
+
+O botão mostra contagem regressiva ("descansando"); o servidor devolve `esperarSegundos`. O admin vê "⚠ Série suspeita" em quem
+já registrou série acima de 100.
+
 ## Exclusão de série ("o guerreiro errou")
 - Só séries **de hoje**. Três caminhos: botão **Desfazer** no aviso (8s) após registrar, link **"Errei o número, desfazer"** na tela de comemoração, e a lixeira em "Séries de hoje".
 - Após excluir, as taças do período atual são recalculadas: se deixou de ser recorde, a taça é removida.

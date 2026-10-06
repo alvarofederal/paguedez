@@ -4,7 +4,8 @@ export const quantidadeSchema = z.coerce
   .number({ invalid_type_error: "Informe um número" })
   .int("Só números inteiros")
   .min(1, "Pague pelo menos uma!")
-  .max(1000, "Máximo de 1000 por registro")
+  // Acima do teto o servidor responde com a mensagem amigável de avaliarLimites
+  .max(100_000, "Número inválido")
 
 export const novoUsuarioSchema = z.object({
   name: z.string().trim().min(2, "Informe seu nome").max(80),

@@ -2,6 +2,7 @@ import "server-only"
 import bcrypt from "bcryptjs"
 import prisma from "@/lib/prisma"
 import { papelPorEmail } from "@/lib/admin"
+import { LIMITES } from "@/lib/limites"
 import type { NovoUsuario } from "@/lib/validators"
 
 export async function criarUsuario(dados: NovoUsuario) {
@@ -34,5 +35,12 @@ export async function listarUsuarios() {
       _count: { select: { registros: true, tacas: true } },
     },
   })
-  return usuarios.map((u) => ({ ...u, papel: papelPorEmail(u.email) }))
+  // Maior série de cada um: série acima do limite de "tem certeza?" é sinal de sacanagem
+  const maiores = await prisma.registro.groupBy({ by: ["userId"], _max: { quantidade: true } })
+  const maiorPorUsuario = new Map(maiores.map((m) => [m.userId, m._max.quantidade ?? 0]))
+
+  return usuarios.map((u) => {
+    const maiorSerie = maiorPorUsuario.get(u.id) ?? 0
+    return { ...u, papel: papelPorEmail(u.email), maiorSerie, suspeito: maiorSerie > LIMITES.confirmarAcima }
+  })
 }

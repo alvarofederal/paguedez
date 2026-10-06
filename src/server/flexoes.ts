@@ -2,6 +2,7 @@ import "server-only"
 import prisma from "@/lib/prisma"
 import type { Prisma } from "@/generated/prisma"
 import { diaBrasilia, somarDias } from "@/lib/periodos"
+import { avaliarLimites } from "@/lib/limites"
 import { avaliarRecordes, resumirPeriodos, type AvaliacaoPeriodo, type TotalDia } from "@/lib/recordes"
 import type { TipoTaca } from "@/lib/tacas"
 
@@ -70,6 +71,17 @@ export async function registrarSerie(userId: string, quantidade: number, agora =
 
   return prisma.$transaction(
     async (tx) => {
+      // Trava a linha do usuário: dois cliques simultâneos entram um de cada vez,
+      // senão ambos passariam pela checagem de limites antes de qualquer um gravar.
+      await tx.$queryRaw`SELECT id FROM users WHERE id = ${userId} FOR UPDATE`
+
+      const registrosHoje = await tx.registro.findMany({
+        where: { userId, dia },
+        select: { quantidade: true, feitoEm: true },
+      })
+      const limite = avaliarLimites(quantidade, registrosHoje, agora)
+      if (!limite.ok) return { bloqueio: limite } as const
+
       const registro = await tx.registro.create({ data: { userId, quantidade, dia, feitoEm: agora } })
 
       const conquistas: Conquista[] = []
@@ -87,7 +99,7 @@ export async function registrarSerie(userId: string, quantidade: number, agora =
       const dias = await totaisPorDia(tx, userId)
       conquistas.push(...(await sincronizarTacas(tx, userId, avaliarRecordes(dias, dia))))
 
-      return { registroId: registro.id, conquistas, resumo: resumirPeriodos(dias, dia) }
+      return { bloqueio: null, registroId: registro.id, conquistas, resumo: resumirPeriodos(dias, dia) } as const
     },
     { timeout: 20_000 }
   )

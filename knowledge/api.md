@@ -15,4 +15,6 @@
 | `adminAlternarAtivo` | ADMIN | userId (o admin nunca pode ser desativado) | `{ erro }` |
 | `sair` | logado | — | redireciona para `/login` |
 
+`pagarFlecas` também devolve `{ erro, esperarSegundos }` quando uma trava barra o registro (ver `knowledge/domain.md`).
+
 `conquistas[]`: `{ tipo, periodo, valor, nivel, nova }` — `nova=false` quando só ampliou um recorde já batido no período.

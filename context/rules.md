@@ -9,6 +9,7 @@
 - Cores apenas via tokens CSS de `globals.css`.
 
 ## Nunca
+- Nunca fazer redirecionamento de login/logout no servidor (`signOut`/`signIn` com `redirectTo`): usar `next-auth/react` com `redirect: false` + `window.location`, para não depender de `NEXTAUTH_URL`.
 - Nunca confiar só no front-end para limitar registros: toda trava vale no servidor (`src/lib/limites.ts`).
 - Nunca alterar `prisma/schema.prisma` sem confirmar com o usuário.
 - Nunca calcular "dia" com UTC — use `diaBrasilia()`.

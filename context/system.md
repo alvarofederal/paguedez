@@ -27,6 +27,7 @@ Uso em segundos: abrir → número → **PAGUEI!** → (talvez) comemorar um rec
 | `DATABASE_URL` | MySQL do Pague Dez |
 | `AUTH_SECRET` | Assinatura do JWT da sessão |
 | `AUTH_TRUST_HOST` | `true` na Vercel |
+| `NEXTAUTH_URL` | **Não definir na Vercel** (no `.env` local só serve p/ dev). Se apontar para outro endereço, redirecionamentos feitos no servidor vão para lá. O logout já é feito no navegador por isso. |
 
 ## Identidade visual
 Estilo "álbum de adesivos" inspirado no slush.app: papel pastel, contorno preto, pílulas, paleta de adesivos,

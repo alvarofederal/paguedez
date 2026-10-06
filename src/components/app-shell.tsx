@@ -1,6 +1,5 @@
 import Link from "next/link"
-import { LogOut } from "lucide-react"
-import { sair } from "@/app/_actions/auth"
+import { BotaoSair } from "./botao-sair"
 import { Marca } from "./marca"
 import { NavInferior } from "./nav-inferior"
 import { FaixaRolante } from "./faixa-rolante"
@@ -22,11 +21,7 @@ export function AppShell({ usuario, children }: Props) {
         </Link>
         <div className="flex items-center gap-2">
           <span className="pilula pilula-fantasma max-w-36 truncate !px-3 !py-2 text-xs">Sd. {primeiroNome}</span>
-          <form action={sair}>
-            <button type="submit" className="pilula pilula-fantasma !p-2.5" aria-label="Sair" title="Sair">
-              <LogOut className="h-4 w-4" />
-            </button>
-          </form>
+          <BotaoSair />
         </div>
       </header>
 

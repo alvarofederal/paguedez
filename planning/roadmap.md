@@ -11,7 +11,8 @@
 - [x] Gráfico dos últimos 30 dias com linha de recorde
 - [x] Tema azul/rosa por sexo
 - [x] Identidade visual (estilo slush.app — ver context/design.md)
-- [ ] Deploy na Vercel
+- [x] Landing page pública
+- [x] Deploy na Vercel
 
 > **Estratégia (2026-10-06):** usar o básico por 1–2 meses antes de abrir ao público.
 > As fases P1/P2 são ideias guardadas — só começam quando o usuário decidir.

@@ -60,6 +60,6 @@ npm run build      # prisma generate + db push + next build
 | Rota | Descrição |
 |------|-----------|
 | `/login`, `/cadastro` | Acesso (só o email do dono, em `src/lib/admin.ts`, vira ADMIN) |
-| `/` | Campo de quantidade + botão PAGUEI! + placar do dia/semana/mês/ano |
+| `/` | Visitante: **landing page** (o que é, como funciona, taças, por que todo dia). Logado: campo de quantidade + botão PAGUEI! + placar do dia/semana/mês/ano |
 | `/historico` | Recordes atuais, gráfico de 30 dias, galeria de taças, últimas séries |
 | `/admin/usuarios` | Admin: cadastrar e ativar/desativar usuários (não há promoção a admin) |

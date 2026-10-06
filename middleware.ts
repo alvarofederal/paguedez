@@ -8,7 +8,8 @@ const ROTAS_PUBLICAS = ["/login", "/cadastro"]
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  if (ROTAS_PUBLICAS.some((rota) => pathname.startsWith(rota))) {
+  // "/" é pública: visitante vê a landing, usuário logado vê o app (decidido na própria página)
+  if (pathname === "/" || ROTAS_PUBLICAS.some((rota) => pathname.startsWith(rota))) {
     return NextResponse.next()
   }
 

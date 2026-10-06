@@ -39,6 +39,11 @@ Aplicado por `data-sexo` no `<html>` (layout raiz, a partir do usuário logado).
 - **UI**: Inter 500/700 (substituto do Aeonik Pro) — corpo com `letter-spacing: -0.01em`, números tabulares.
 - **Rótulos**: `.rotulo` — 12px, 700, maiúsculas, `letter-spacing: 0.032em`.
 
+## Landing page (`src/app/_components/landing.tsx`)
+Faixas de cor alternadas (`--lavado`, branco, `--nevoa`, lavanda), títulos `.display` gigantes, adesivos girados e cards coloridos.
+Cuidado: com `line-height: 0.8`, acento/til em maiúsculas no MEIO do título some atrás da linha de cima (preto sobre preto) —
+evite palavras como NÃO/AÇÃO no meio de títulos de várias linhas. Ao usar `.pilula` não combine com `hidden` (a classe vence): envolva num `<span className="hidden sm:block">`.
+
 ## Componentes-chave
 - **Faixa rolante** (`FaixaRolante`): tarja preta no topo com mensagens militares.
 - **Nav inferior**: pílula branca flutuante; item ativo preto cheio.

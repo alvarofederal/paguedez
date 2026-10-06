@@ -17,7 +17,7 @@ src/
 ├── app/
 │   ├── _actions/           # Server Actions: autenticação + Zod + chamam src/server
 │   ├── _components/        # componentes da tela inicial
-│   ├── page.tsx            # / — PAGUEI!
+│   ├── page.tsx            # / — visitante: Landing; logado: PAGUEI!
 │   ├── historico/          # /historico
 │   ├── admin/usuarios/     # /admin/usuarios
 │   ├── login/, cadastro/   # acesso público

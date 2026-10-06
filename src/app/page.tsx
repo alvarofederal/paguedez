@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation"
 import { usuarioAtual } from "@/lib/auth"
 import { painelDoDia } from "@/server/flexoes"
 import { AppShell } from "@/components/app-shell"
@@ -6,13 +5,14 @@ import { Taca } from "@/components/taca"
 import { PlacarPeriodos } from "@/components/placar-periodos"
 import { SeriesHoje } from "@/components/series-hoje"
 import { categoriaTaca, NOME_TIPO_TACA } from "@/lib/tacas"
+import { Landing } from "./_components/landing"
 import { PagarForm } from "./_components/pagar-form"
 
 export const dynamic = "force-dynamic"
 
 export default async function InicioPage() {
   const usuario = await usuarioAtual()
-  if (!usuario) redirect("/login")
+  if (!usuario) return <Landing /> // visitante: landing page pública
 
   const { resumo, seriesHoje, ultimaTaca } = await painelDoDia(usuario.id)
 

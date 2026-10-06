@@ -7,5 +7,6 @@
 - Histórico com gráfico de 30 dias
 - Administração de usuários (admin único, definido por email)
 - Travas anti-abuso no botão PAGUEI! (intervalo, rajada, tetos por série e por dia) com contagem regressiva
+- Landing page pública em `/` para visitantes (o que é, como funciona, taças, por que pagar flecas todo dia)
 - Botão "Desfazer" após cada registro e na tela de comemoração
 - Identidade visual estilo slush.app com tema azul/rosa por sexo

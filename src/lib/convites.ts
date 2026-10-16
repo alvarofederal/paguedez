@@ -59,7 +59,14 @@ export function urlWhatsapp(texto: string, numero?: string): string {
   return `https://wa.me/${numero ?? ""}?text=${encodeURIComponent(texto)}`
 }
 
-/** A mensagem do usuário sempre leva o link no final — ele não precisa (nem consegue) apagar. */
+const LINK_NO_FINAL = /\s*https?:\/\/\S+\/convite\/[A-Za-z0-9_-]+\s*$/
+
+/** Tira um link de convite que já esteja no final do texto (ex.: o de um envio anterior, que deixou de valer). */
+export function removerLinkDeConvite(texto: string): string {
+  return texto.replace(LINK_NO_FINAL, "").trim()
+}
+
+/** Mensagem + link do convite (uma linha abaixo). É o texto que vai ao WhatsApp e que o usuário pode copiar. */
 export function textoFinal(mensagem: string, link: string): string {
-  return `${mensagem.trim()}\n${link}`
+  return `${removerLinkDeConvite(mensagem)}\n${link}`
 }

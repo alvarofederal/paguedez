@@ -43,7 +43,7 @@ export type DadosConvite = {
   comunidadeId?: string | null
 }
 
-export type ConviteCriado = { erro: null; conviteId: string; link: string; whatsappUrl: string; mascara: string; reenviado: boolean }
+export type ConviteCriado = { erro: null; conviteId: string; link: string; texto: string; whatsappUrl: string; mascara: string; reenviado: boolean }
 
 export async function criarConvite(
   convidante: { id: string; name: string },
@@ -109,11 +109,13 @@ export async function criarConvite(
 
   const link = `${origem}/convite/${token}`
   const mensagem = dados.mensagem?.trim() || mensagemPadrao(dados.apelido, primeiroNome(convidante.name), pelotao?.nome)
+  const texto = textoFinal(mensagem, link)
   return {
     erro: null,
     conviteId: resultado.id,
     link,
-    whatsappUrl: urlWhatsapp(textoFinal(mensagem, link), tel.numero),
+    texto,
+    whatsappUrl: urlWhatsapp(texto, tel.numero),
     mascara: tel.mascara,
     reenviado: resultado.reenviado,
   }

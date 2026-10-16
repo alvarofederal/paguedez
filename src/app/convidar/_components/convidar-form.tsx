@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { criarConviteAction } from "@/app/_actions/social"
 import { estiloCampo, estiloRotulo } from "@/components/cartao-acesso"
 import { primeiroNome } from "@/lib/comunidade"
-import { MODELOS_MENSAGEM, mensagemPadrao } from "@/lib/convites"
+import { MODELOS_MENSAGEM, mensagemPadrao, removerLinkDeConvite } from "@/lib/convites"
 import { abrirWhatsapp } from "@/lib/abrir-whatsapp"
 
 type Pelotao = { id: string; nome: string }
@@ -20,6 +20,7 @@ export function ConvidarForm({ meuNome, pelotoes, pelotaoInicial }: { meuNome: s
   const [enviando, setEnviando] = useState(false)
   const [pronto, setPronto] = useState<{ link: string; whatsappUrl: string; reenviado: boolean } | null>(null)
   const [copiado, setCopiado] = useState(false)
+  const [mensagemCopiada, setMensagemCopiada] = useState(false)
   const cartaoRef = useRef<HTMLDivElement>(null)
 
   // Mostra o resultado na tela assim que o convite é criado (a página não é abandonada)
@@ -30,20 +31,24 @@ export function ConvidarForm({ meuNome, pelotoes, pelotaoInicial }: { meuNome: s
   const quem = primeiroNome(meuNome)
   const nomeAmigo = apelido.trim() || "amigo"
   const pelotao = pelotoes.find((p) => p.id === pelotaoId)
-  // Mensagem sugerida; se o usuário editar, vale o texto dele. O link entra sempre no final, pelo servidor.
+  // Mensagem sugerida; se o usuário editar, vale o texto dele. Ao criar o convite o link é colocado no final da própria mensagem.
   const sugerida = pelotao ? mensagemPadrao(nomeAmigo, quem, pelotao.nome) : MODELOS_MENSAGEM[modelo](nomeAmigo, quem)
   const mensagem = personalizada ?? sugerida
+  // "Copiar mensagem" só vale quando a mensagem já contém o link do convite criado
+  const temLink = pronto !== null && mensagem.includes(pronto.link)
 
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault()
     setEnviando(true)
     try {
-      const r = await criarConviteAction({ apelido, telefone, mensagem, comunidadeId: pelotaoId || null })
+      // Se já havia um link na mensagem (envio anterior), tira: o servidor coloca o link novo no final
+      const r = await criarConviteAction({ apelido, telefone, mensagem: removerLinkDeConvite(mensagem), comunidadeId: pelotaoId || null })
       if (r.erro !== null || !("whatsappUrl" in r)) {
         toast.error(r.erro ?? "Não foi possível criar o convite")
         return
       }
       setPronto({ link: r.link, whatsappUrl: r.whatsappUrl, reenviado: r.reenviado })
+      setPersonalizada(r.texto) // o campo Mensagem passa a mostrar: mensagem + link
       abrirWhatsapp(r.whatsappUrl)
     } catch {
       toast.error("Não foi possível criar o convite agora. Tente de novo em instantes.")
@@ -60,6 +65,16 @@ export function ConvidarForm({ meuNome, pelotoes, pelotaoInicial }: { meuNome: s
       setTimeout(() => setCopiado(false), 2000)
     } catch {
       toast.error("Não foi possível copiar. Selecione o link e copie manualmente.")
+    }
+  }
+
+  const copiarMensagem = async () => {
+    try {
+      await navigator.clipboard.writeText(mensagem)
+      setMensagemCopiada(true)
+      setTimeout(() => setMensagemCopiada(false), 2000)
+    } catch {
+      toast.error("Não foi possível copiar. Selecione o texto da mensagem e copie manualmente.")
     }
   }
 
@@ -112,11 +127,25 @@ export function ConvidarForm({ meuNome, pelotoes, pelotaoInicial }: { meuNome: s
             id="mensagem"
             value={mensagem}
             onChange={(e) => setPersonalizada(e.target.value)}
-            rows={4}
-            maxLength={240}
+            rows={temLink ? 6 : 4}
+            maxLength={360}
             className="w-full rounded-[20px] border border-black bg-white px-4 py-3 font-medium outline-none focus:bg-[var(--lavado)]"
           />
-          <p className="mt-1.5 ml-4 text-xs text-[var(--texto-3)]">O seu link de convite é colocado no final da mensagem automaticamente.</p>
+          <p className="mt-1.5 ml-4 text-xs text-[var(--texto-3)]">
+            {temLink
+              ? "Pronto: o seu link de convite foi adicionado no final da mensagem."
+              : "Ao tocar em \"Mandar pagar dez no WhatsApp\", o seu link de convite é criado e colocado no final desta mensagem."}
+          </p>
+          <button
+            type="button"
+            onClick={copiarMensagem}
+            disabled={!temLink}
+            title={temLink ? "Copia a mensagem com o link" : "Disponível depois de criar o convite"}
+            className="pilula pilula-fantasma mt-2 w-full !py-3 text-sm"
+          >
+            {mensagemCopiada ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {mensagemCopiada ? "Mensagem copiada!" : "Copiar mensagem (com o link)"}
+          </button>
         </div>
 
         <button type="submit" disabled={enviando} className="pilula pilula-cheia w-full !py-4 text-base">

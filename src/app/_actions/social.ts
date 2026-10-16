@@ -37,7 +37,7 @@ export async function criarConviteAction(dados: unknown) {
 
   const r = await criarConvite({ id: user.id, name: user.name }, v.data, await origemDoSite())
   revalidatePath("/convidar")
-  return r.erro === null ? { erro: null, link: r.link, whatsappUrl: r.whatsappUrl, mascara: r.mascara, reenviado: r.reenviado } : { erro: r.erro }
+  return r.erro === null ? { erro: null, link: r.link, texto: r.texto, whatsappUrl: r.whatsappUrl, mascara: r.mascara, reenviado: r.reenviado } : { erro: r.erro }
 }
 
 export async function reenviarConviteAction(conviteId: string) {

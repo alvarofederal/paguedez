@@ -48,6 +48,8 @@ já registrou série acima de 100.
 - **Convite**: link `/convite/<token>`; token aleatório de 128 bits, só o SHA-256 fica no banco. Validade de 7 dias, uso único por aceitante.
   Telefone = HMAC-SHA256 (segredo `CONVITE_SECRET` ou `AUTH_SECRET`) + máscara. Mesmo amigo + mesmo pelotão pendente = **reenvio** (não gasta cota).
   O link do WhatsApp (`wa.me`) é aberto pelo navegador do usuário; o app não envia mensagens.
+  A mensagem final é **mensagem + link na linha de baixo** (`textoFinal`); o campo "Mensagem" passa a mostrá-la com o link e há o botão
+  "Copiar mensagem". Um link de convite antigo no fim do texto é removido antes de colocar o novo (`removerLinkDeConvite`).
 - **Cotas** (`src/lib/planos.ts`): máx. 5 pendentes, 10 convites/24h, 5 pelotões por comandante, 100 membros por pelotão — sempre valem.
   O limite de **amigos por plano** (3 no grátis) só vale com `COBRANCA_ATIVA=true`; hoje é ilimitado.
 - **Visibilidade** (0 só ranking · 1 + recordes e taças · 2 + séries de hoje e gráfico): entre amigos cada lado define o que mostra;

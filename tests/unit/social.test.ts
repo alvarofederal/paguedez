@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import { limitesDoPeriodo } from "@/lib/periodos"
 import { normalizarTelefoneBR } from "@/lib/telefone"
 import { faltamParaPassar, ordenarRanking } from "@/lib/ranking"
-import { avaliarCriacaoConvite, dataDeExpiracao, mensagemPadrao, statusEfetivo, textoFinal, urlWhatsapp } from "@/lib/convites"
+import { avaliarCriacaoConvite, dataDeExpiracao, mensagemPadrao, removerLinkDeConvite, statusEfetivo, textoFinal, urlWhatsapp } from "@/lib/convites"
 import { emblemasMerecidos, type EstatisticasEmblemas } from "@/lib/emblemas"
 import { LIMITES_SOCIAL, limiteDeAmigos } from "@/lib/planos"
 import { nivelValido, podeVerDetalhes, podeVerRecordes } from "@/lib/visibilidade"
@@ -112,6 +112,19 @@ describe("convites", () => {
     expect(url.startsWith("https://wa.me/5511999998888?text=")).toBe(true)
     expect(decodeURIComponent(url.split("text=")[1])).toBe(texto)
     expect(urlWhatsapp("oi").startsWith("https://wa.me/?text=")).toBe(true)
+  })
+
+  it("o link vai no final da mensagem e nunca duplica nem fica um link velho", () => {
+    const velho = "https://x.app/convite/AAAAAA111111"
+    const novo = "https://x.app/convite/BBBBBB222222"
+    const msg = "Soldado Silva! Aceita o desafio?"
+    expect(textoFinal(msg, novo)).toBe(`${msg}\n${novo}`)
+    // reenvio: a mensagem já traz o link anterior (que deixou de valer) — é trocado, não somado
+    expect(textoFinal(`${msg}\n${velho}`, novo)).toBe(`${msg}\n${novo}`)
+    expect(removerLinkDeConvite(`${msg}\n${velho}`)).toBe(msg)
+    expect(removerLinkDeConvite(msg)).toBe(msg)
+    // um link que NÃO é de convite no meio do texto é preservado
+    expect(removerLinkDeConvite("veja https://exemplo.com/ajuda e entre")).toBe("veja https://exemplo.com/ajuda e entre")
   })
 
   it("mensagem de pelotão cita o nome do pelotão", () => {

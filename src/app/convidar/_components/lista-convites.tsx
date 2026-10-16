@@ -3,6 +3,7 @@
 import { useTransition } from "react"
 import { toast } from "sonner"
 import { cancelarConviteAction, reenviarConviteAction } from "@/app/_actions/social"
+import { abrirWhatsapp } from "@/lib/abrir-whatsapp"
 
 type Convite = {
   id: string
@@ -35,7 +36,7 @@ export function ListaConvites({ convites }: { convites: Convite[] }) {
     iniciar(async () => {
       const r = await reenviarConviteAction(id)
       if (r.erro !== null || !("whatsappUrl" in r)) return void toast.error(r.erro ?? "Erro ao reenviar")
-      window.location.href = r.whatsappUrl // abre o WhatsApp para escolher o contato (o número não fica guardado)
+      abrirWhatsapp(r.whatsappUrl) // abre o WhatsApp para escolher o contato (o número não fica guardado)
     })
 
   const cancelar = (id: string) =>

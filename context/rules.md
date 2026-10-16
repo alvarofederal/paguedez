@@ -9,6 +9,8 @@
 - Cores apenas via tokens CSS de `globals.css`.
 
 ## Nunca
+- Nunca trocar a página do app por um link externo (`window.location`) para abrir o WhatsApp: deixa tela em branco ao voltar. Use `abrirWhatsapp()` (`src/lib/abrir-whatsapp.ts`: outra aba) e mantenha o botão de reserva na tela.
+- Nunca deixar uma ação do cliente sem `try/catch/finally`: erro de servidor não pode deixar o botão girando nem a tela em branco (há `src/app/error.tsx` como rede de segurança).
 - Nunca gravar o telefone de um amigo por inteiro nem o token do convite em texto: use HMAC/máscara e hash (`src/server/convites.ts`).
 - Nunca expor dado de outro usuário sem checar amizade/pertencimento e o nível de visibilidade (`PerfilVisivel` só busca o que o nível permite).
 - Páginas privadas do social começam com `exigirUsuarioSocial()`; as públicas (`/convite`, `/c`) com `exigirSocial()`.

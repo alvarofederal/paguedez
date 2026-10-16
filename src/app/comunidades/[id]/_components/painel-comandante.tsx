@@ -85,7 +85,7 @@ export function PainelComandante({
           <button type="button" onClick={copiar} className="pilula pilula-cheia !px-4 !py-2 text-xs">
             {copiado ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />} {copiado ? "Copiado!" : "Copiar"}
           </button>
-          <a href={urlWhatsapp(texto)} className="pilula pilula-fantasma !px-4 !py-2 text-xs">
+          <a href={urlWhatsapp(texto)} target="_blank" rel="noopener noreferrer" className="pilula pilula-fantasma !px-4 !py-2 text-xs">
             <Send className="h-4 w-4" /> Compartilhar no WhatsApp
           </a>
         </div>

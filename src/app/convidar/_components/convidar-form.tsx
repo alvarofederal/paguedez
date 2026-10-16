@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Check, Copy, Loader2, Send } from "lucide-react"
 import { toast } from "sonner"
 import { criarConviteAction } from "@/app/_actions/social"
 import { estiloCampo, estiloRotulo } from "@/components/cartao-acesso"
 import { primeiroNome } from "@/lib/comunidade"
 import { MODELOS_MENSAGEM, mensagemPadrao } from "@/lib/convites"
+import { abrirWhatsapp } from "@/lib/abrir-whatsapp"
 
 type Pelotao = { id: string; nome: string }
 
@@ -19,6 +20,12 @@ export function ConvidarForm({ meuNome, pelotoes, pelotaoInicial }: { meuNome: s
   const [enviando, setEnviando] = useState(false)
   const [pronto, setPronto] = useState<{ link: string; whatsappUrl: string; reenviado: boolean } | null>(null)
   const [copiado, setCopiado] = useState(false)
+  const cartaoRef = useRef<HTMLDivElement>(null)
+
+  // Mostra o resultado na tela assim que o convite é criado (a página não é abandonada)
+  useEffect(() => {
+    if (pronto) cartaoRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+  }, [pronto])
 
   const quem = primeiroNome(meuNome)
   const nomeAmigo = apelido.trim() || "amigo"
@@ -30,16 +37,19 @@ export function ConvidarForm({ meuNome, pelotoes, pelotaoInicial }: { meuNome: s
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault()
     setEnviando(true)
-    const r = await criarConviteAction({ apelido, telefone, mensagem, comunidadeId: pelotaoId || null })
-    if (r.erro !== null || !("whatsappUrl" in r)) {
-      toast.error(r.erro ?? "Não foi possível criar o convite")
+    try {
+      const r = await criarConviteAction({ apelido, telefone, mensagem, comunidadeId: pelotaoId || null })
+      if (r.erro !== null || !("whatsappUrl" in r)) {
+        toast.error(r.erro ?? "Não foi possível criar o convite")
+        return
+      }
+      setPronto({ link: r.link, whatsappUrl: r.whatsappUrl, reenviado: r.reenviado })
+      abrirWhatsapp(r.whatsappUrl)
+    } catch {
+      toast.error("Não foi possível criar o convite agora. Tente de novo em instantes.")
+    } finally {
       setEnviando(false)
-      return
     }
-    setPronto({ link: r.link, whatsappUrl: r.whatsappUrl, reenviado: r.reenviado })
-    setEnviando(false)
-    // Abre o WhatsApp direto (navegação normal, não é bloqueada como pop-up)
-    window.location.href = r.whatsappUrl
   }
 
   const copiar = async () => {
@@ -116,11 +126,11 @@ export function ConvidarForm({ meuNome, pelotoes, pelotaoInicial }: { meuNome: s
       </form>
 
       {pronto && (
-        <div className="adesivo mt-4 bg-[var(--menta)] p-5" role="status">
+        <div ref={cartaoRef} className="adesivo mt-4 bg-[var(--menta)] p-5" role="status">
           <p className="font-bold">{pronto.reenviado ? "Esse amigo já tinha convite: gerei um link novo." : "Convite criado!"}</p>
-          <p className="mt-1 text-sm">O WhatsApp deveria ter aberto. Se não abriu, use os botões:</p>
+          <p className="mt-1 text-sm">O WhatsApp abre em outra aba ou no aplicativo. Se não abriu, toque em <strong>Abrir WhatsApp</strong>:</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <a href={pronto.whatsappUrl} className="pilula pilula-cheia">
+            <a href={pronto.whatsappUrl} target="_blank" rel="noopener noreferrer" className="pilula pilula-cheia">
               <Send className="h-4 w-4" /> Abrir WhatsApp
             </a>
             <button type="button" onClick={copiar} className="pilula pilula-fantasma">

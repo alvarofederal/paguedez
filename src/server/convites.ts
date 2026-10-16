@@ -28,6 +28,8 @@ function hmacDoTelefone(numero: string): string {
 }
 
 const DIA_MS = 24 * 60 * 60 * 1000
+// Banco remoto + várias consultas: o padrão de 5s é curto demais em produção (como em registrarSerie)
+const TRANSACAO = { timeout: 20_000, maxWait: 10_000 }
 
 async function travarUsuario(tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0], userId: string) {
   // Serializa convites do mesmo usuário (dois cliques ao mesmo tempo não furam as cotas)
@@ -101,7 +103,7 @@ export async function criarConvite(
       },
     })
     return { erro: null, id: criado.id, reenviado: false }
-  })
+  }, TRANSACAO)
 
   if (resultado.erro !== null) return { erro: resultado.erro }
 
@@ -235,7 +237,7 @@ export async function aceitarConvite(userId: string, token: string, nivel: Nivel
 
     await tx.convite.update({ where: { id: convite.id }, data: { status: "ACEITO", aceitoEm: agora, aceitoPorId: userId } })
     return { erro: null, convidanteId: convite.convidanteId, comunidadeId: convite.comunidadeId }
-  })
+  }, TRANSACAO)
 
   // Quem convidou ganha o emblema de Recrutador (fora da transação: é só um bônus)
   if (resultado.erro === null) await sincronizarEmblemasSemErro(resultado.convidanteId)

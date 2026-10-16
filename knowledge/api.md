@@ -38,3 +38,6 @@
 | `/tropa`, `/tropa/[userId]` | logado / amigos | ranking de amigos, visibilidade, perfil do amigo |
 | `/comunidades`, `/comunidades/[id]`, `/comunidades/[id]/membro/[userId]` | logado / membros | pelotões, ranking, comando, perfil do membro |
 | `/emblemas` | logado | emblemas conquistados e bloqueados |
+
+| `convocarAmigoAction(comunidadeId, amigoId)` | membro do pelotão | cria a convocação (pendente) para um amigo |
+| `responderConvocacaoAction(id, aceitar)` | o convidado | aceita (entra no pelotão) ou recusa |

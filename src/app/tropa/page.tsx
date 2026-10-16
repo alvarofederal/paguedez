@@ -4,6 +4,7 @@ import { exigirUsuarioSocial } from "@/server/social"
 import { AppShell } from "@/components/app-shell"
 import { AbasPeriodo, periodoDaUrl, RankingLista } from "@/components/ranking-lista"
 import { listarAmigos } from "@/server/amizades"
+import { listarConvocacoes } from "@/server/comunidades"
 import { rankingDe } from "@/server/ranking"
 import { AmigoConfig } from "./_components/amigo-config"
 
@@ -20,12 +21,21 @@ export default async function TropaPage({ searchParams }: { searchParams: Promis
   const usuario = await exigirUsuarioSocial()
   const periodo = periodoDaUrl((await searchParams).p)
 
-  const amigos = await listarAmigos(usuario.id)
+  const [amigos, convocacoes] = await Promise.all([listarAmigos(usuario.id), listarConvocacoes(usuario.id)])
   const linhas = await rankingDe([usuario.id, ...amigos.map((a) => a.userId)], periodo)
 
   return (
     <AppShell usuario={usuario}>
       <h1 className="display mt-2 mb-5 text-[52px]">Tropa</h1>
+
+      {convocacoes.length > 0 && (
+        <Link href="/comunidades" className="mb-4 flex items-center justify-between gap-3 rounded-[20px] border border-black bg-[var(--brasa)] p-4 text-white">
+          <span className="font-bold leading-tight">
+            Você tem {convocacoes.length} {convocacoes.length === 1 ? "convocação" : "convocações"} para pelotão!
+          </span>
+          <span className="pilula pilula-fantasma shrink-0 !px-4 !py-2 text-xs">Ver</span>
+        </Link>
+      )}
 
       <ul className="grid gap-3 sm:grid-cols-3">
         {ATALHOS.map(({ href, titulo, texto, icone: Icone, cor }) => (

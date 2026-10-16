@@ -8,10 +8,12 @@ import { aceitarConvite, cancelarConvite, criarConvite, reenviarConvite } from "
 import { definirMinhaVisibilidade, desfazerAmizade } from "@/server/amizades"
 import {
   atualizarComunidade,
+  convocarAmigo,
   criarComunidade,
   entrarPorCodigo,
   excluirComunidade,
   removerMembro,
+  responderConvocacao,
   sairDaComunidade,
 } from "@/server/comunidades"
 import { origemDoSite } from "@/server/social"
@@ -168,5 +170,29 @@ export async function entrarPorCodigoAction(codigo: string) {
 
   const r = await entrarPorCodigo(user.id, t.data)
   revalidatePath("/comunidades")
+  return r
+}
+
+export async function convocarAmigoAction(comunidadeId: string, amigoId: string) {
+  const user = await entrada()
+  if (!user) return SEM_SESSAO
+  const c = idSchema.safeParse(comunidadeId)
+  const m = idSchema.safeParse(amigoId)
+  if (!c.success || !m.success) return { erro: "Dados inválidos" }
+
+  const r = await convocarAmigo(user.id, c.data, m.data)
+  revalidatePath(`/comunidades/${c.data}`)
+  return r
+}
+
+export async function responderConvocacaoAction(convocacaoId: string, aceitar: boolean) {
+  const user = await entrada()
+  if (!user) return SEM_SESSAO
+  const id = idSchema.safeParse(convocacaoId)
+  if (!id.success) return { erro: "Convocação inválida" }
+
+  const r = await responderConvocacao(user.id, id.data, aceitar === true)
+  revalidatePath("/comunidades")
+  revalidatePath("/tropa")
   return r
 }

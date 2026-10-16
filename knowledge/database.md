@@ -42,3 +42,8 @@ de propósito. Rode-as manualmente com cuidado, após confirmar.
 Enums: `StatusConvite` (PENDENTE/ACEITO/EXPIRADO/CANCELADO), `PapelComunidade`, `TipoEmblema`.
 Com `relationMode = "prisma"` não há chaves estrangeiras: exclusões em cadeia são feitas à mão (ex.: `excluirComunidade`).
 Nenhuma coluna de `users`, `registros` ou `tacas` foi alterada.
+
+### Convocações (adicionada em 2026-10-16)
+| Tabela | Modelo | Para quê |
+|--------|--------|----------|
+| `convocacoes` | `Convocacao` | comunidadeId, convidadoId, convidanteId, status (PENDENTE/ACEITA/RECUSADA), único por (comunidadeId, convidadoId). Chama para o pelotão um **amigo que já está no app**; ele precisa aceitar. |

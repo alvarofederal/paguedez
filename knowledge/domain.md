@@ -58,3 +58,9 @@ já registrou série acima de 100.
 - **Privacidade das páginas**: perfil de amigo só para amigos conectados; pelotão só para membros (para os demais é 404).
 - **Emblemas** (`src/lib/emblemas.ts`): regras puras; sincronizados ao abrir `/emblemas` e ao aceitar convite/criar pelotão (melhor esforço).
   Recrutador = 1º convite aceito. Para criar outro: catálogo + `enum TipoEmblema`.
+
+### Convocar um amigo que já está no app para o pelotão
+- Quem é do pelotão chama um **amigo conectado** (`convocarAmigo`); ninguém é colocado à força: entrar significa mostrar dados no nível que o
+  comandante definiu, então o amigo vê **o que será visível** e **aceita ou recusa** em `/comunidades` (aviso também em `/tropa`).
+- Só amigos podem ser chamados; quem **recusou** não é incomodado de novo; quem aceitou e depois saiu pode ser chamado outra vez; excluir o pelotão apaga as convocações.
+- O item **Pelotão** do menu só aparece depois que o usuário é de algum pelotão (um só: vai direto a ele; vários: lista). Criar/entrar continua em **Tropa**.

@@ -4,9 +4,10 @@ import prisma from "@/lib/prisma"
 import { aceitarConvite, cancelarConvite, consultarConvite, criarConvite, listarConvites, reenviarConvite } from "@/server/convites"
 import { definirMinhaVisibilidade, desfazerAmizade, listarAmigos, nivelQueAmigoMostra } from "@/server/amizades"
 import {
-  atualizarComunidade, criarComunidade, entrarPorCodigo, excluirComunidade, listarMinhasComunidades, obterComunidade,
-  removerMembro, sairDaComunidade,
+  amigosParaConvocar, atualizarComunidade, convocarAmigo, criarComunidade, entrarPorCodigo, excluirComunidade, listarConvocacoes,
+  listarMinhasComunidades, obterComunidade, removerMembro, responderConvocacao, sairDaComunidade,
 } from "@/server/comunidades"
+import { parOrdenado } from "@/lib/amizade"
 import { listarEmblemas } from "@/server/emblemas"
 import { rankingDe } from "@/server/ranking"
 import { diaBrasilia } from "@/lib/periodos"
@@ -39,6 +40,7 @@ afterAll(async () => {
   const coms = await prisma.comunidade.findMany({ where: { donoId: { in: todos } }, select: { id: true } })
   await prisma.membroComunidade.deleteMany({ where: { OR: [{ userId: { in: todos } }, { comunidadeId: { in: coms.map((c) => c.id) } }] } })
   await prisma.comunidade.deleteMany({ where: { donoId: { in: todos } } })
+  await prisma.convocacao.deleteMany({ where: { OR: [{ convidadoId: { in: todos } }, { convidanteId: { in: todos } }] } })
   await prisma.convite.deleteMany({ where: { convidanteId: { in: todos } } })
   await prisma.amizade.deleteMany({ where: { OR: [{ usuarioAId: { in: todos } }, { usuarioBId: { in: todos } }] } })
   await prisma.emblema.deleteMany({ where: { userId: { in: todos } } })
@@ -252,5 +254,83 @@ describe("emblemas por uso", () => {
     await prisma.registro.create({ data: { userId: B.id, quantidade: 50, dia: "2026-01-01" } })
     const depois = await listarEmblemas(B.id)
     expect(depois.emblemas.find((e) => e.tipo === "CENTENARIO")?.conquistadoEm).not.toBeNull()
+  })
+})
+
+describe("convocar amigo que já está no app", () => {
+  let comId = ""
+  const amizade = async (x: string, y: string) => {
+    const [a, b] = parOrdenado(x, y)
+    await prisma.amizade.upsert({ where: { usuarioAId_usuarioBId: { usuarioAId: a, usuarioBId: b } }, update: {}, create: { usuarioAId: a, usuarioBId: b } })
+  }
+
+  it("prepara: A comanda um pelotão e é amigo de B e D (C não é amigo de ninguém)", async () => {
+    await prisma.emblema.deleteMany({ where: { userId: A.id } })
+    await prisma.comunidade.deleteMany({ where: { donoId: A.id } })
+    await prisma.membroComunidade.deleteMany({ where: { userId: { in: [A.id, B.id, C.id, D.id] } } })
+    const r = await criarComunidade(A.id, { nome: "Veteranos 1996", cor: "sol", nivelVisibilidade: 1 })
+    if (r.erro !== null) throw new Error(r.erro)
+    comId = r.id
+    // testes anteriores deixaram amizades: aqui só B e D são amigos de A; C é estranha
+    const [x, y] = parOrdenado(A.id, C.id)
+    await prisma.amizade.deleteMany({ where: { usuarioAId: x, usuarioBId: y } })
+    await amizade(A.id, B.id)
+    await amizade(A.id, D.id)
+  })
+
+  it("lista só amigos que ainda não estão no pelotão", async () => {
+    const lista = await amigosParaConvocar(A.id, comId)
+    expect(lista.map((x) => x.userId).sort()).toEqual([B.id, D.id].sort())
+    expect(lista.every((x) => x.pendente === false)).toBe(true)
+    expect(await amigosParaConvocar(C.id, comId)).toEqual([]) // quem não é do pelotão não vê nada
+  })
+
+  it("só convoca amigo; estranho e não-membro são barrados", async () => {
+    expect((await convocarAmigo(A.id, comId, C.id)).erro).toMatch(/não é seu amigo/)
+    expect((await convocarAmigo(C.id, comId, B.id)).erro).toMatch(/pode convocar/)
+    expect((await convocarAmigo(A.id, comId, A.id)).erro).toMatch(/já está/)
+  })
+
+  it("convoca B: fica pendente (não entra sozinho) e repetir não duplica", async () => {
+    expect(await convocarAmigo(A.id, comId, B.id)).toEqual({ erro: null, jaPendente: false })
+    expect(await convocarAmigo(A.id, comId, B.id)).toEqual({ erro: null, jaPendente: true })
+    expect(await prisma.convocacao.count({ where: { comunidadeId: comId, convidadoId: B.id } })).toBe(1)
+    expect(await obterComunidade(comId, B.id)).toBeNull() // ainda não é membro
+    expect((await amigosParaConvocar(A.id, comId)).find((x) => x.userId === B.id)?.pendente).toBe(true)
+
+    const pend = await listarConvocacoes(B.id)
+    expect(pend).toHaveLength(1)
+    expect(pend[0]).toMatchObject({ nome: "Veteranos 1996", nivelVisibilidade: 1 })
+    expect(await listarConvocacoes(D.id)).toEqual([])
+  })
+
+  it("só o convidado responde; recusar não entra e não pode ser reconvocado", async () => {
+    const [conv] = await listarConvocacoes(B.id)
+    expect((await responderConvocacao(C.id, conv.id, true)).erro).toBe("Convocação não encontrada.")
+    expect((await responderConvocacao(B.id, conv.id, false)).erro).toBeNull()
+    expect(await obterComunidade(comId, B.id)).toBeNull()
+    expect((await responderConvocacao(B.id, conv.id, true)).erro).toBe("Você já respondeu a esta convocação.")
+    expect((await convocarAmigo(A.id, comId, B.id)).erro).toMatch(/já respondeu/)
+    expect(await listarConvocacoes(B.id)).toEqual([])
+  })
+
+  it("aceitar entra no pelotão; quem saiu pode ser chamado de novo", async () => {
+    expect((await convocarAmigo(A.id, comId, D.id)).erro).toBeNull()
+    const [conv] = await listarConvocacoes(D.id)
+    const r = await responderConvocacao(D.id, conv.id, true)
+    expect(r).toEqual({ erro: null, comunidadeId: comId })
+    expect((await obterComunidade(comId, D.id))?.membros.map((m) => m.userId).sort()).toEqual([A.id, D.id].sort())
+    expect((await convocarAmigo(A.id, comId, D.id)).erro).toMatch(/já está no pelotão/)
+    expect((await amigosParaConvocar(A.id, comId)).map((x) => x.userId)).toEqual([B.id]) // D saiu da lista
+
+    expect((await sairDaComunidade(D.id, comId)).erro).toBeNull()
+    expect((await convocarAmigo(A.id, comId, D.id)).erro).toBeNull() // aceitou e saiu: pode ser chamado de novo
+    expect(await listarConvocacoes(D.id)).toHaveLength(1)
+  })
+
+  it("convocação some quando o pelotão é excluído", async () => {
+    expect((await excluirComunidade(A.id, comId)).erro).toBeNull()
+    expect(await listarConvocacoes(D.id)).toEqual([])
+    expect(await prisma.convocacao.count({ where: { comunidadeId: comId } })).toBe(0)
   })
 })

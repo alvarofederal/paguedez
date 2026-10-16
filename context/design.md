@@ -46,7 +46,7 @@ evite palavras como NÃO/AÇÃO no meio de títulos de várias linhas. Ao usar `
 
 ## Componentes-chave
 - **Faixa rolante** (`FaixaRolante`): tarja preta no topo com mensagens militares.
-- **Nav inferior**: pílula branca flutuante; item ativo preto cheio.
+- **Nav inferior**: pílula branca flutuante; item ativo preto cheio. Com 4+ itens só o ativo mostra o nome (os outros ficam só com ícone) para caber no celular; o item **Pelotão** só existe para quem já tem pelotão.
 - **Botão PAGUEI!**: círculo preto dentro de um disco `--marca` com contorno.
 - **Placar**: 4 adesivos coloridos levemente girados (Hoje/Semana/Mês/Ano).
 - **Taça**: SVG chapado com contorno preto; selo-estrela atrás a partir da Prata; estrela na copa a partir do Ouro; coroa na Lendária.

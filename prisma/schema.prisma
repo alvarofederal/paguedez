@@ -181,3 +181,25 @@ model Emblema {
   @@id([userId, tipo])
   @@map("emblemas")
 }
+
+// Convocação: alguém do pelotão chama um AMIGO que já está no app. O amigo precisa aceitar
+// (consentimento: entrar num pelotão significa mostrar dados no nível que o comandante definiu).
+enum StatusConvocacao {
+  PENDENTE
+  ACEITA
+  RECUSADA
+}
+
+model Convocacao {
+  id           String           @id @default(cuid())
+  comunidadeId String
+  convidadoId  String
+  convidanteId String
+  status       StatusConvocacao @default(PENDENTE)
+  criadoEm     DateTime         @default(now())
+  respondidoEm DateTime?
+
+  @@unique([comunidadeId, convidadoId])
+  @@index([convidadoId, status])
+  @@map("convocacoes")
+}

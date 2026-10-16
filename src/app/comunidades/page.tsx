@@ -3,7 +3,8 @@ import { ChevronRight } from "lucide-react"
 import { exigirUsuarioSocial } from "@/server/social"
 import { AppShell } from "@/components/app-shell"
 import { corCss } from "@/lib/comunidade"
-import { listarMinhasComunidades } from "@/server/comunidades"
+import { listarConvocacoes, listarMinhasComunidades } from "@/server/comunidades"
+import { CartaoConvocacao } from "./_components/cartao-convocacao"
 import { NovaComunidade } from "./_components/nova-comunidade"
 
 export const dynamic = "force-dynamic"
@@ -11,13 +12,24 @@ export const metadata = { title: "Pelotões" }
 
 export default async function ComunidadesPage() {
   const usuario = await exigirUsuarioSocial()
-  const pelotoes = await listarMinhasComunidades(usuario.id)
+  const [pelotoes, convocacoes] = await Promise.all([listarMinhasComunidades(usuario.id), listarConvocacoes(usuario.id)])
 
   return (
     <AppShell usuario={usuario}>
       <Link href="/tropa" className="rotulo underline underline-offset-4">← Tropa</Link>
       <h1 className="display mt-3 mb-2 text-[48px] sm:text-[52px]">Pelotões</h1>
       <p className="mb-6 font-medium">Comunidades de Pagação: monte o seu pelotão e veja quem lidera o ranking.</p>
+
+      {convocacoes.length > 0 && (
+        <section className="mb-8">
+          <h2 className="rotulo mb-3">Convocações para você ({convocacoes.length})</h2>
+          <ul className="space-y-3">
+            {convocacoes.map((c) => (
+              <CartaoConvocacao key={c.id} convocacao={c} />
+            ))}
+          </ul>
+        </section>
+      )}
 
       <NovaComunidade />
 

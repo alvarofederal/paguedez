@@ -4,14 +4,18 @@ import { Marca } from "./marca"
 import { NavInferior } from "./nav-inferior"
 import { FaixaRolante } from "./faixa-rolante"
 import { socialAtivo } from "@/lib/social-flag"
+import { meusPelotoesIds } from "@/server/comunidades"
 
 type Props = {
-  usuario: { name: string; papel: "ADMIN" | "USUARIO" }
+  usuario: { id?: string; name: string; papel: "ADMIN" | "USUARIO" }
   children: React.ReactNode
 }
 
-export function AppShell({ usuario, children }: Props) {
+export async function AppShell({ usuario, children }: Props) {
   const primeiroNome = usuario.name.split(" ")[0]
+  const social = socialAtivo()
+  // "Pelotão" só aparece no menu depois que o usuário tem um (criar/entrar continua em Tropa)
+  const pelotoes = social && usuario.id ? await meusPelotoesIds(usuario.id) : []
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -28,7 +32,7 @@ export function AppShell({ usuario, children }: Props) {
 
       <main className="mx-auto w-full max-w-xl flex-1 px-4 pb-32">{children}</main>
 
-      <NavInferior admin={usuario.papel === "ADMIN"} social={socialAtivo()} />
+      <NavInferior admin={usuario.papel === "ADMIN"} social={social} pelotaoHref={pelotoes.length === 0 ? null : pelotoes.length === 1 ? `/comunidades/${pelotoes[0]}` : "/comunidades"} pelotoes={pelotoes.length} />
     </div>
   )
 }

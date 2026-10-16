@@ -1,5 +1,10 @@
 # Releases — Pague Dez
 
+## v0.2.1 — Convocar amigo para o pelotão (2026-10-16)
+- Quem é do pelotão chama um amigo que já está no app; o amigo aceita ou recusa vendo o que será visível
+- Item **Pelotão** no menu apenas para quem já tem pelotão; aviso de convocação em Tropa
+- Menu compacto (ícones) quando há 4 ou mais itens
+
 ## v0.2.0 — Social (2026-10-16)
 - Convites por WhatsApp (`/convidar`, `/convite/[token]`), amizades, ranking de amigos (`/tropa`)
 - Comunidades de Pagação (`/comunidades`, `/c/[codigo]`), com visibilidade definida pelo comandante

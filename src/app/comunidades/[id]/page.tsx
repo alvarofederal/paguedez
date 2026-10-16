@@ -6,9 +6,10 @@ import { AppShell } from "@/components/app-shell"
 import { AbasPeriodo, periodoDaUrl, RankingLista } from "@/components/ranking-lista"
 import { corCss, primeiroNome } from "@/lib/comunidade"
 import { NIVEIS_VISIBILIDADE } from "@/lib/visibilidade"
-import { obterComunidade } from "@/server/comunidades"
+import { amigosParaConvocar, obterComunidade } from "@/server/comunidades"
 import { rankingDe } from "@/server/ranking"
 import { AcoesMembro } from "./_components/acoes-membro"
+import { ConvocarAmigos } from "./_components/convocar-amigos"
 import { PainelComandante } from "./_components/painel-comandante"
 
 export const dynamic = "force-dynamic"
@@ -25,7 +26,10 @@ export default async function PelotaoPage({ params, searchParams }: { params: Pr
   const { comunidade, meuPapel, membros } = dados
   const comandante = meuPapel === "DONO"
 
-  const linhas = await rankingDe(membros.map((m) => m.userId), periodo)
+  const [linhas, amigosDisponiveis] = await Promise.all([
+    rankingDe(membros.map((m) => m.userId), periodo),
+    amigosParaConvocar(usuario.id, id),
+  ])
   const nivel = NIVEIS_VISIBILIDADE[comunidade.nivelVisibilidade] ?? NIVEIS_VISIBILIDADE[0]
   const linkEntrada = `${await origemDoSite()}/c/${comunidade.codigoEntrada}`
   const donoNome = membros.find((m) => m.userId === comunidade.donoId)?.name
@@ -57,6 +61,8 @@ export default async function PelotaoPage({ params, searchParams }: { params: Pr
           <Send className="h-5 w-5" /> Convidar um amigo para o pelotão
         </Link>
       </section>
+
+      <ConvocarAmigos comunidadeId={id} amigos={amigosDisponiveis} />
 
       {comandante ? (
         <PainelComandante

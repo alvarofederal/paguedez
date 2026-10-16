@@ -1,4 +1,7 @@
+import Link from "next/link"
+import { Send } from "lucide-react"
 import { usuarioAtual } from "@/lib/auth"
+import { socialAtivo } from "@/lib/social-flag"
 import { painelDoDia } from "@/server/flexoes"
 import { AppShell } from "@/components/app-shell"
 import { Taca } from "@/components/taca"
@@ -23,6 +26,18 @@ export default async function InicioPage() {
       </section>
 
       <PlacarPeriodos resumo={resumo} />
+
+      {socialAtivo() && (
+        <section className="mt-4 flex flex-col gap-3 rounded-[20px] border border-black bg-[var(--violeta)] p-4 text-white sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="display text-2xl">Chame a tropa!</p>
+            <p className="text-sm font-medium">Mande um amigo pagar dez pelo WhatsApp e veja quem lidera o ranking.</p>
+          </div>
+          <Link href="/convidar" className="pilula pilula-fantasma shrink-0">
+            <Send className="h-4 w-4" /> Mandar pagar dez
+          </Link>
+        </section>
+      )}
 
       {ultimaTaca && (
         <section className="mt-4 flex items-center gap-4 rounded-[20px] border border-black bg-[var(--lavanda)] p-4">

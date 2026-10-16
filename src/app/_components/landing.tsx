@@ -213,6 +213,31 @@ export function Landing() {
         </p>
       </Secao>
 
+      {/* Chame a tropa (social) */}
+      <Secao fundo="var(--nevoa)">
+        <h2 className="display text-[56px] sm:text-[88px]">
+          Chame
+          <br />
+          a tropa
+        </h2>
+        <p className="mt-6 mb-8 max-w-2xl text-lg font-medium">
+          Pagar dez é mais divertido em grupo. Mande um amigo pagar dez direto pelo <strong>WhatsApp</strong>, monte o seu
+          <strong> pelotão</strong> e veja quem está liderando o ranking — e ganhe emblemas como o de <strong>Recrutador</strong>.
+        </p>
+        <ul className="grid gap-3 sm:grid-cols-3">
+          {[
+            ["Mande pelo WhatsApp", "O app abre a conversa com a mensagem e o seu link. É só enviar.", "var(--menta)"],
+            ["Monte seu pelotão", "Convide a galera e acompanhe o ranking do grupo.", "var(--lavanda)"],
+            ["Você escolhe o que mostra", "Só o ranking, recordes e taças, ou tudo. Privacidade na mão de quem manda.", "var(--sol)"],
+          ].map(([titulo, texto, cor]) => (
+            <li key={titulo} className={`rounded-[20px] ${contorno} p-5`} style={{ background: cor }}>
+              <h3 className="text-xl font-bold leading-tight">{titulo}</h3>
+              <p className="mt-2 text-sm font-medium">{texto}</p>
+            </li>
+          ))}
+        </ul>
+      </Secao>
+
       {/* 6. Jogo limpo */}
       <Secao fundo="var(--lavanda)">
         <div className="grid items-center gap-8 md:grid-cols-[auto_1fr]">

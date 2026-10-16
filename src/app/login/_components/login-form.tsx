@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { estiloBotaoPrincipal, estiloCampo, estiloRotulo } from "@/components/cartao-acesso"
 
-export function LoginForm() {
+export function LoginForm({ proximo = "/" }: { proximo?: string }) {
   const [carregando, setCarregando] = useState(false)
 
   const entrar = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,7 +27,7 @@ export function LoginForm() {
     }
 
     // Recarrega a página inteira para aplicar o tema (azul/rosa) do usuário
-    window.location.href = "/"
+    window.location.href = proximo
   }
 
   return (

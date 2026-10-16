@@ -48,3 +48,4 @@ next-env.d.ts
 backups/
 *.sql
 .claude/worktrees/
+.tmp-scripts/

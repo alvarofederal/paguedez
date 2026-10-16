@@ -10,7 +10,7 @@ import { estiloBotaoPrincipal } from "@/components/cartao-acesso"
 
 type Sexo = "MASCULINO" | "FEMININO"
 
-export function CadastroForm() {
+export function CadastroForm({ proximo = "/" }: { proximo?: string }) {
   const [carregando, setCarregando] = useState(false)
   const [sexo, setSexo] = useState<Sexo | null>(null)
 
@@ -45,10 +45,10 @@ export function CadastroForm() {
     const login = await signIn("credentials", { email: dados.email, password: dados.password, redirect: false })
     if (!login || login.error) {
       toast.success("Conta criada! Faça login.")
-      window.location.href = "/login"
+      window.location.href = proximo === "/" ? "/login" : `/login?next=${encodeURIComponent(proximo)}`
       return
     }
-    window.location.href = "/"
+    window.location.href = proximo
   }
 
   return (

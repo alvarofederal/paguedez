@@ -29,3 +29,16 @@ MySQL via Prisma 5 (`relationMode = "prisma"`). Schema completo em `prisma/schem
 ## Atualização do schema
 O build da Vercel roda `prisma db push` (sem `--accept-data-loss`): mudanças destrutivas fazem o build falhar
 de propósito. Rode-as manualmente com cuidado, após confirmar.
+
+## Tabelas do social (adicionadas em 2026-10-16 — somente tabelas novas, sem relações declaradas)
+| Tabela | Modelo | Para quê |
+|--------|--------|----------|
+| `convites` | `Convite` | convidanteId, comunidadeId?, apelido, **telefoneHmac** + **telefoneMascara** (o número inteiro nunca é gravado), **tokenHash** (SHA-256 do token do link), status, expiraEm, abertoEm, aceitoEm, aceitoPorId |
+| `amizades` | `Amizade` | par ordenado (usuarioAId < usuarioBId), `aMostra`/`bMostra` = nível que cada lado mostra ao outro |
+| `comunidades` | `Comunidade` | donoId, nome, descricao, cor, **nivelVisibilidade** (decidido pelo dono), codigoEntrada (único), entradaAtiva |
+| `membros_comunidade` | `MembroComunidade` | PK (comunidadeId, userId), papel DONO/MEMBRO |
+| `emblemas` | `Emblema` | PK (userId, tipo), conquistadoEm — emblema ganho nunca é retirado |
+
+Enums: `StatusConvite` (PENDENTE/ACEITO/EXPIRADO/CANCELADO), `PapelComunidade`, `TipoEmblema`.
+Com `relationMode = "prisma"` não há chaves estrangeiras: exclusões em cadeia são feitas à mão (ex.: `excluirComunidade`).
+Nenhuma coluna de `users`, `registros` ou `tacas` foi alterada.

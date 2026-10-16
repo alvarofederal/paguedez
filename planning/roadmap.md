@@ -20,6 +20,13 @@
 > **Atualização (2026-10-16):** o dono pediu o descritivo de **Convites por WhatsApp + Comunidade de Pagação + ranking de amigos**.
 > Ver `planning/convites-comunidade.md` (proposta aguardando aprovação; nada implementado).
 
+## Social — v0.2 (implementado em 2026-10-16)
+- [x] Convite por WhatsApp com link único, reenvio, cancelamento e expiração
+- [x] Amizades com visibilidade escolhida por cada lado; ranking de amigos
+- [x] Comunidades de Pagação (pelotões): visibilidade definida pelo dono, link de entrada, ranking
+- [x] Emblemas (inclui Recrutador) e página de emblemas
+- [ ] Cobrança / planos (decisão do dono: depois de ver o uso)
+
 ## P1 — Hábito e viralização (futuro)
 - Desafio "Pague Dez": mandar um amigo pagar dez via link do WhatsApp
 - Ofensiva (dias seguidos pagando)

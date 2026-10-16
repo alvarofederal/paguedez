@@ -1,5 +1,11 @@
 # Releases — Pague Dez
 
+## v0.2.0 — Social (2026-10-16)
+- Convites por WhatsApp (`/convidar`, `/convite/[token]`), amizades, ranking de amigos (`/tropa`)
+- Comunidades de Pagação (`/comunidades`, `/c/[codigo]`), com visibilidade definida pelo comandante
+- Emblemas e página `/emblemas` (Recruta, Recrutador, Comandante, Persistente, Centenário)
+- Tudo aditivo e atrás de `FEATURE_SOCIAL`; cobrança preparada, porém desligada
+
 ## v0.1.0 — MVP (em desenvolvimento)
 - Projeto criado a partir do projetobase; todo o domínio Courtesyfy removido
 - Autenticação por credenciais com sessão JWT

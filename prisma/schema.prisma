@@ -79,3 +79,105 @@ model Taca {
   @@index([userId])
   @@map("tacas")
 }
+
+// ─────────────────────────────────────────────────────────────
+// SOCIAL — convites por WhatsApp, amizades, comunidades e emblemas
+// Somente tabelas novas, sem relações declaradas: as tabelas users,
+// registros e tacas não sofrem nenhuma alteração. Ver planning/convites-comunidade.md
+// ─────────────────────────────────────────────────────────────
+
+enum StatusConvite {
+  PENDENTE
+  ACEITO
+  EXPIRADO
+  CANCELADO
+}
+
+enum PapelComunidade {
+  DONO
+  MEMBRO
+}
+
+enum TipoEmblema {
+  RECRUTA
+  RECRUTADOR
+  COMANDANTE
+  PERSISTENTE
+  CENTENARIO
+}
+
+// Convite de um usuário para um amigo (opcionalmente para uma comunidade).
+// O link carrega um token aleatório; no banco só existe o SHA-256 dele.
+// O telefone nunca é guardado por inteiro: HMAC (anti-duplicidade) + máscara (exibição).
+model Convite {
+  id              String        @id @default(cuid())
+  convidanteId    String
+  comunidadeId    String?
+  apelido         String        @db.VarChar(40)
+  telefoneHmac    String        @db.VarChar(64)
+  telefoneMascara String        @db.VarChar(24)
+  tokenHash       String        @unique @db.VarChar(64)
+  status          StatusConvite @default(PENDENTE)
+  criadoEm        DateTime      @default(now())
+  expiraEm        DateTime
+  abertoEm        DateTime?
+  aceitoEm        DateTime?
+  aceitoPorId     String?
+
+  @@index([convidanteId, status])
+  @@index([convidanteId, telefoneHmac])
+  @@index([comunidadeId])
+  @@map("convites")
+}
+
+// Amizade é por par (A < B pelo id). aMostra/bMostra = nível que cada lado mostra ao outro:
+// 0 só ranking · 1 + recordes e taças · 2 + séries e gráfico.
+model Amizade {
+  id              String   @id @default(cuid())
+  usuarioAId      String
+  usuarioBId      String
+  aMostra         Int      @default(0)
+  bMostra         Int      @default(0)
+  origemConviteId String?
+  criadoEm        DateTime @default(now())
+
+  @@unique([usuarioAId, usuarioBId])
+  @@index([usuarioBId])
+  @@map("amizades")
+}
+
+// O DONO escolhe o que os membros enxergam uns dos outros (nivelVisibilidade 0, 1 ou 2).
+model Comunidade {
+  id                String   @id @default(cuid())
+  donoId            String
+  nome              String   @db.VarChar(40)
+  descricao         String?  @db.VarChar(140)
+  cor               String   @db.VarChar(16)
+  nivelVisibilidade Int      @default(0)
+  codigoEntrada     String   @unique @db.VarChar(16)
+  entradaAtiva      Boolean  @default(true)
+  criadoEm          DateTime @default(now())
+
+  @@index([donoId])
+  @@map("comunidades")
+}
+
+model MembroComunidade {
+  comunidadeId String
+  userId       String
+  papel        PapelComunidade @default(MEMBRO)
+  entrouEm     DateTime        @default(now())
+
+  @@id([comunidadeId, userId])
+  @@index([userId])
+  @@map("membros_comunidade")
+}
+
+model Emblema {
+  userId        String
+  tipo          TipoEmblema
+  conquistadoEm DateTime    @default(now())
+
+  @@id([userId, tipo])
+  @@map("emblemas")
+}

@@ -9,6 +9,9 @@
 - Cores apenas via tokens CSS de `globals.css`.
 
 ## Nunca
+- Nunca gravar o telefone de um amigo por inteiro nem o token do convite em texto: use HMAC/máscara e hash (`src/server/convites.ts`).
+- Nunca expor dado de outro usuário sem checar amizade/pertencimento e o nível de visibilidade (`PerfilVisivel` só busca o que o nível permite).
+- Páginas privadas do social começam com `exigirUsuarioSocial()`; as públicas (`/convite`, `/c`) com `exigirSocial()`.
 - Nunca fazer redirecionamento de login/logout no servidor (`signOut`/`signIn` com `redirectTo`): usar `next-auth/react` com `redirect: false` + `window.location`, para não depender de `NEXTAUTH_URL`.
 - Nunca confiar só no front-end para limitar registros: toda trava vale no servidor (`src/lib/limites.ts`).
 - Nunca alterar `prisma/schema.prisma` sem confirmar com o usuário.

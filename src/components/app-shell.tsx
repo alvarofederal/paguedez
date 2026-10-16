@@ -3,6 +3,7 @@ import { BotaoSair } from "./botao-sair"
 import { Marca } from "./marca"
 import { NavInferior } from "./nav-inferior"
 import { FaixaRolante } from "./faixa-rolante"
+import { socialAtivo } from "@/lib/social-flag"
 
 type Props = {
   usuario: { name: string; papel: "ADMIN" | "USUARIO" }
@@ -27,7 +28,7 @@ export function AppShell({ usuario, children }: Props) {
 
       <main className="mx-auto w-full max-w-xl flex-1 px-4 pb-32">{children}</main>
 
-      <NavInferior admin={usuario.papel === "ADMIN"} />
+      <NavInferior admin={usuario.papel === "ADMIN"} social={socialAtivo()} />
     </div>
   )
 }

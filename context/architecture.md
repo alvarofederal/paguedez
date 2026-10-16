@@ -38,3 +38,10 @@ middleware.ts               # redireciona para /login sem cookie de sessão
 ## Proteção de rotas
 - `middleware.ts` só verifica o cookie (edge, sem banco).
 - Cada página chama `usuarioAtual()`, que confere no banco se o usuário existe e está ativo.
+
+## Camada social (2026-10-16)
+- Regras puras (testáveis, sem banco): `src/lib/{planos,telefone,convites,visibilidade,ranking,emblemas,comunidade,amizade,social-flag}.ts`
+  e `limitesDoPeriodo` em `periodos.ts`.
+- Casos de uso com banco: `src/server/{convites,amizades,comunidades,ranking,emblemas,social}.ts` (`social.ts` = flag, origem do site, `exigirUsuarioSocial`).
+- Server Actions: `src/app/_actions/social.ts`. Páginas: `convidar/`, `convite/[token]/`, `c/[codigo]/`, `tropa/`, `comunidades/`, `emblemas/`.
+- Componentes: `seletor-nivel`, `ranking-lista`, `perfil-visivel`, `emblema`, `campos-comunidade`.

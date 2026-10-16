@@ -65,3 +65,28 @@ export function rotuloPeriodo(tipo: TipoPeriodo | "PRIMEIRA", periodo: string): 
       return periodo
   }
 }
+
+// Intervalo de dias ("YYYY-MM-DD", inclusivo) que um período cobre — usado nos rankings.
+// Comparar texto ISO funciona: "2026-10-05" <= "2026-10-31".
+export function limitesDoPeriodo(tipo: TipoPeriodo, dia: string): { de: string; ate: string } {
+  switch (tipo) {
+    case "DIARIO":
+      return { de: dia, ate: dia }
+    case "SEMANAL": {
+      const diaSemana = paraDataUTC(dia).getUTCDay() || 7 // segunda = 1 ... domingo = 7
+      const segunda = somarDias(dia, 1 - diaSemana)
+      return { de: segunda, ate: somarDias(segunda, 6) }
+    }
+    case "MENSAL":
+      return { de: `${dia.slice(0, 7)}-01`, ate: `${dia.slice(0, 7)}-31` }
+    case "ANUAL":
+      return { de: `${dia.slice(0, 4)}-01-01`, ate: `${dia.slice(0, 4)}-12-31` }
+  }
+}
+
+export const ROTULO_PERIODO: Record<TipoPeriodo, string> = {
+  DIARIO: "Hoje",
+  SEMANAL: "Semana",
+  MENSAL: "Mês",
+  ANUAL: "Ano",
+}

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-const ROTAS_PUBLICAS = ["/login", "/cadastro"]
+// /convite/<token> e /c/<codigo> são as páginas que o amigo abre pelo link do WhatsApp (ainda sem conta)
+const ROTAS_PUBLICAS = ["/login", "/cadastro", "/convite/", "/c/"]
 
 // Checagem leve só pelo cookie (sem Prisma no edge).
 // A validação real da sessão acontece no layout de cada área protegida.

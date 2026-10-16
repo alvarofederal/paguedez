@@ -18,3 +18,23 @@
 `pagarFlecas` também devolve `{ erro, esperarSegundos }` quando uma trava barra o registro (ver `knowledge/domain.md`).
 
 `conquistas[]`: `{ tipo, periodo, valor, nivel, nova }` — `nova=false` quando só ampliou um recorde já batido no período.
+
+## Social (`src/app/_actions/social.ts`) — todas exigem sessão e `FEATURE_SOCIAL` ligado; entrada validada com Zod
+| Action | Quem | Resultado |
+|--------|------|-----------|
+| `criarConviteAction` | logado | `{ erro, link, whatsappUrl, mascara, reenviado }` |
+| `reenviarConviteAction` / `cancelarConviteAction` | dono do convite | novo link (sem número: o WhatsApp abre a lista de contatos) / cancela |
+| `aceitarConviteAction(token, nivel)` | logado (não o convidante) | cria amizade (+ entra no pelotão, se for o caso) |
+| `definirVisibilidadeAction`, `desfazerAmizadeAction` | amigo | muda o que EU mostro / desfaz |
+| `criarComunidadeAction`, `atualizarComunidadeAction`, `excluirComunidadeAction`, `removerMembroAction` | comandante | gestão do pelotão |
+| `sairDaComunidadeAction`, `entrarPorCodigoAction` | membro / logado | sair / entrar pelo link |
+
+### Rotas do social
+| Rota | Acesso | Descrição |
+|------|--------|-----------|
+| `/convidar` | logado | formulário do convite + convites enviados |
+| `/convite/[token]` | **pública** | convite aberto pelo amigo (cadastro/login com `?next=` e depois o aceite) |
+| `/c/[codigo]` | **pública** | entrada no pelotão pelo link |
+| `/tropa`, `/tropa/[userId]` | logado / amigos | ranking de amigos, visibilidade, perfil do amigo |
+| `/comunidades`, `/comunidades/[id]`, `/comunidades/[id]/membro/[userId]` | logado / membros | pelotões, ranking, comando, perfil do membro |
+| `/emblemas` | logado | emblemas conquistados e bloqueados |

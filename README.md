@@ -24,7 +24,8 @@ AUTH_TRUST_HOST=true
 | Comando | O que faz |
 |---------|-----------|
 | `npm run dev` | Servidor de desenvolvimento |
-| `npm test` | Testes das regras de recorde e taças |
+| `npm test` | Testes unitários (recordes, taças, travas, social) |
+| `npm run test:integracao` | Testes de integração no banco real (convites, amizades, pelotões, ranking); limpam o que criam |
 | `npm run db:push` | Aplica o `prisma/schema.prisma` no banco |
 | `npm run build` | Gera o Prisma, aplica o schema e compila |
 

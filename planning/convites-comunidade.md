@@ -1,6 +1,22 @@
 # Convites e Comunidade de Pagação — Descritivo
 
-> Status: **proposta para aprovação** (2026-10-16). Nada disto foi implementado.
+> Status: **implementado em 2026-10-16** (branch `feature/convites-comunidade`). Este texto é a proposta original; as decisões e o que mudou estão logo abaixo.
+
+## Decisões do dono (2026-10-16) e como ficaram
+| # | Decisão | Como foi implementado |
+|---|---------|-----------------------|
+| 1 | **Quem escolhe a visibilidade no pelotão é o DONO** (só ranking / + recordes e taças / tudo) | `Comunidade.nivelVisibilidade`, editável só pelo comandante; vale para todos os membros. Entre **amigos** (fora de pelotão) cada lado escolhe o que mostra ao outro. |
+| 2 | Endereço dos links: **Vercel por enquanto** | O link usa o endereço de onde o app está rodando (cabeçalhos da requisição); ao trocar de domínio nada precisa ser configurado. |
+| 3 | **Comunidade junto com os convites** | Convite aceita `comunidadeId`; há também link de entrada `/c/<codigo>` do pelotão. |
+| 4 | **Emblema de Recrutador + página de emblemas** | `/emblemas` com 5 emblemas (Recruta, Recrutador, Comandante, Persistente, Centenário); os bloqueados mostram como ganhar. |
+| 5 | **O que é pago fica para depois** | `COBRANCA_ATIVA=false` (padrão): nada é cobrado nem limitado por plano. O gancho (`src/lib/planos.ts`) já existe. |
+
+### O que foi construído
+Convite 1:1 por WhatsApp (token aleatório, telefone só como HMAC + máscara, reenvio, cancelamento, expiração de 7 dias), aceite com escolha de
+visibilidade, amizades, ranking de amigos, pelotões (criar, editar, link de entrada, remover membro, sair, excluir), ranking por pelotão,
+perfil por nível de visibilidade, emblemas, botão "Mandar pagar dez" na tela inicial e item **Tropa** na navegação.
+Tudo atrás de `FEATURE_SOCIAL` (ligado por padrão; `false` esconde tudo).
+Fora desta entrega (ficam no backlog): QR code do pelotão, cutucar, duelo, meta coletiva, campeão da semana, notificações, cobrança.
 > Origem: ideia do dono do produto — "mandar um amigo pagar dez" pelo WhatsApp, limite de convites grátis,
 > comunidades e ranking entre amigos. O que é pago e o que é grátis será definido **depois** de tudo pronto.
 

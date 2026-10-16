@@ -5,7 +5,12 @@
 | Prioridade | Item | Observação |
 |-----------|------|-----------|
 | P0 | Deploy Vercel + domínio | Variáveis: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_TRUST_HOST=true` |
-| P1 | Convites por WhatsApp, amigos, Comunidade de Pagação e ranking | Descritivo pronto em `planning/convites-comunidade.md`, aguardando decisões |
+| ✅ | Convites por WhatsApp, amigos, pelotões, ranking e emblemas | Entregue em 2026-10-16 (`planning/convites-comunidade.md`) |
+| P1 | Cutucar amigo que não pagou hoje | Ideia da seção 11 do descritivo |
+| P1 | Mensagens prontas extras e QR code do pelotão | |
+| P1 | Campeão da semana (taça de comunidade) e meta coletiva | |
+| P2 | Duelo semanal 1×1, rankings por dias seguidos | |
+| P2 | Planos pagos e cobrança (R$ 10/mês) | Decidir o que é pago depois de ver o uso; gancho em `src/lib/planos.ts` |
 | P1 | Ofensiva (streak) | Reforça o uso diário |
 | P1 | Card compartilhável da taça | Imagem gerada com a taça e o recorde |
 | P1 | PWA + notificação diária | "O sargento está esperando suas flecas" |

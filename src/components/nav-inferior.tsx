@@ -2,14 +2,15 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Dumbbell, Shield, Trophy } from "lucide-react"
+import { Dumbbell, Shield, Trophy, Users } from "lucide-react"
 
-export function NavInferior({ admin }: { admin: boolean }) {
+export function NavInferior({ admin, social = false }: { admin: boolean; social?: boolean }) {
   const pathname = usePathname()
 
   const itens = [
     { href: "/", rotulo: "Pagar", icone: Dumbbell },
     { href: "/historico", rotulo: "Histórico", icone: Trophy },
+    ...(social ? [{ href: "/tropa", rotulo: "Tropa", icone: Users }] : []),
     ...(admin ? [{ href: "/admin/usuarios", rotulo: "Admin", icone: Shield }] : []),
   ]
 

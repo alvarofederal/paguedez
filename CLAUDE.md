@@ -38,6 +38,10 @@ Stack: Next.js 16 (App Router) + TypeScript + MySQL (Prisma 5) + NextAuth v5 (Cr
 8. **Só existe UM admin**: `EMAIL_ADMIN` em `src/lib/admin.ts`. O papel é derivado do email, nunca da coluna do banco; não criar telas/ações para promover outros admins.
 9. Visual segue `context/design.md` (estilo slush.app): tokens de `globals.css`, contorno preto, pílulas, **sem gradiente nem sombra**. Tema azul/rosa por `data-sexo` no `<html>`.
 
+10. **Social é aditivo e fica atrás de `FEATURE_SOCIAL`** (padrão ligado; `false` esconde tudo). Nunca alterar `users`/`registros`/`tacas` por causa dele.
+11. **Telefone de amigo nunca é gravado por inteiro** (só HMAC + máscara) e o token do convite só existe em hash. Dado de outro usuário só aparece conforme o nível de visibilidade.
+12. Cobrança está **desligada** (`COBRANCA_ATIVA=false`); o que é pago será decidido depois — mexer só em `src/lib/planos.ts`.
+
 ## Padrão de Server Action
 
 ```typescript
@@ -51,7 +55,8 @@ if (!user) return { erro: "Sessão expirada. Entre novamente." }
 
 ```bash
 npm run dev        # http://localhost:3000
-npm test           # testes unitários das regras de recorde
+npm test           # testes unitários (recordes, travas, social)
+npm run test:integracao  # integração no banco REAL (com limpeza): social
 npm run build      # prisma generate + db push + next build
 ```
 
@@ -62,4 +67,5 @@ npm run build      # prisma generate + db push + next build
 | `/login`, `/cadastro` | Acesso (só o email do dono, em `src/lib/admin.ts`, vira ADMIN) |
 | `/` | Visitante: **landing page** (o que é, como funciona, taças, por que todo dia). Logado: campo de quantidade + botão PAGUEI! + placar do dia/semana/mês/ano |
 | `/historico` | Recordes atuais, gráfico de 30 dias, galeria de taças, últimas séries |
+| `/convidar`, `/tropa`, `/comunidades`, `/emblemas` | **Social** (ver `knowledge/domain.md`): convite por WhatsApp, ranking de amigos, pelotões, emblemas. Públicas: `/convite/[token]`, `/c/[codigo]` |
 | `/admin/usuarios` | Admin: cadastrar e ativar/desativar usuários (não há promoção a admin) |

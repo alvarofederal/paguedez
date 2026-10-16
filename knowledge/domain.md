@@ -43,3 +43,18 @@ já registrou série acima de 100.
 ## Exclusão de série ("o guerreiro errou")
 - Só séries **de hoje**. Três caminhos: botão **Desfazer** no aviso (8s) após registrar, link **"Errei o número, desfazer"** na tela de comemoração, e a lixeira em "Séries de hoje".
 - Após excluir, as taças do período atual são recalculadas: se deixou de ser recorde, a taça é removida.
+
+## Social: convites, amigos, pelotões e emblemas (regras puras em `src/lib/*`, casos de uso em `src/server/*`)
+- **Convite**: link `/convite/<token>`; token aleatório de 128 bits, só o SHA-256 fica no banco. Validade de 7 dias, uso único por aceitante.
+  Telefone = HMAC-SHA256 (segredo `CONVITE_SECRET` ou `AUTH_SECRET`) + máscara. Mesmo amigo + mesmo pelotão pendente = **reenvio** (não gasta cota).
+  O link do WhatsApp (`wa.me`) é aberto pelo navegador do usuário; o app não envia mensagens.
+- **Cotas** (`src/lib/planos.ts`): máx. 5 pendentes, 10 convites/24h, 5 pelotões por comandante, 100 membros por pelotão — sempre valem.
+  O limite de **amigos por plano** (3 no grátis) só vale com `COBRANCA_ATIVA=true`; hoje é ilimitado.
+- **Visibilidade** (0 só ranking · 1 + recordes e taças · 2 + séries de hoje e gráfico): entre amigos cada lado define o que mostra;
+  no pelotão **só o comandante define**, para todos. Os dados só são buscados se o nível permitir.
+- **Amizade** nasce do aceite do convite (par ordenado, única). Aceitar um convite de pelotão também entra no pelotão.
+- **Ranking** (`rankingDe`): soma de flecas do período (dia/semana ISO/mês/ano, horário de Brasília); desempate por quem completou primeiro;
+  conta desativada some. Somente leitura sobre `registros`.
+- **Privacidade das páginas**: perfil de amigo só para amigos conectados; pelotão só para membros (para os demais é 404).
+- **Emblemas** (`src/lib/emblemas.ts`): regras puras; sincronizados ao abrir `/emblemas` e ao aceitar convite/criar pelotão (melhor esforço).
+  Recrutador = 1º convite aceito. Para criar outro: catálogo + `enum TipoEmblema`.

@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma"
 import { usuarioAtual } from "@/lib/auth"
 import { EMAIL_ADMIN } from "@/lib/admin"
 import { novoUsuarioSchema, type NovoUsuario } from "@/lib/validators"
-import { criarUsuario } from "@/server/usuarios"
+import { criarUsuario, excluirUsuario } from "@/server/usuarios"
 
 // Cadastro público (tela /cadastro). O login é feito no cliente logo em seguida.
 export async function cadastrar(dados: NovoUsuario) {
@@ -40,4 +40,14 @@ export async function adminAlternarAtivo(userId: string) {
   await prisma.user.update({ where: { id: userId }, data: { ativo: !alvo.ativo } })
   revalidatePath("/admin/usuarios")
   return { erro: null }
+}
+
+export async function adminExcluirUsuario(userId: string) {
+  const admin = await exigirAdmin()
+  if (!admin) return { erro: "Acesso negado" }
+  if (admin.id === userId) return { erro: "Você não pode excluir o seu próprio perfil de administrador" }
+
+  const r = await excluirUsuario(userId)
+  revalidatePath("/admin/usuarios")
+  return r
 }

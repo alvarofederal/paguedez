@@ -50,7 +50,7 @@ export default async function UsuariosPage() {
                   </p>
                 )}
               </div>
-              {u.papel !== "ADMIN" && <AcoesUsuario userId={u.id} ativo={u.ativo} />}
+              {u.papel !== "ADMIN" && <AcoesUsuario userId={u.id} nome={u.name} email={u.email} ativo={u.ativo} series={u._count.registros} />}
             </div>
           </li>
         ))}

@@ -41,3 +41,5 @@
 
 | `convocarAmigoAction(comunidadeId, amigoId)` | membro do pelotão | cria a convocação (pendente) para um amigo |
 | `responderConvocacaoAction(id, aceitar)` | o convidado | aceita (entra no pelotão) ou recusa |
+
+| `adminExcluirUsuario(userId)` | ADMIN | exclui o perfil definitivamente (ver `knowledge/domain.md`); `{ erro }` |

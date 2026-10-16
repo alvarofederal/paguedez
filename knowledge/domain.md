@@ -73,3 +73,10 @@ já registrou série acima de 100.
 - Requisitos por patente: **flecas válidas** (teto de 300 por dia), **dias pagos** (≥ 10 flecas no dia) e, de Sargento em diante, **recrutas ativos**
   (amigos que aceitaram o convite e pagaram em 3 dias diferentes). Sem o social ligado, a exigência de recrutas é ignorada.
 - A sincronização roda ao abrir a tela Pagar (falha ali não quebra a tela) e `/patentes`; a promoção é comemorada uma única vez (`novas`).
+
+## Excluir perfil (admin) — `excluirUsuario` em `src/server/usuarios.ts`
+- Apaga o perfil **definitivamente**, com tudo dele: séries, taças, emblemas, patentes, amizades, convocações, convites enviados e os pelotões que comandava
+  (como o banco não tem chaves estrangeiras, a limpeza em cadeia é feita à mão, numa transação). Convites que ele aceitou continuam para quem convidou, sem o vínculo.
+- **Travas**: o administrador nunca pode ser excluído (nem por si mesmo); perfil **com séries registradas** só pode ser excluído **depois de desativado** (dois passos,
+  porque não tem volta). Perfil que nunca registrou nada (quem entrou só por curiosidade) é excluído direto.
+- Na tela `/admin/usuarios`: botão **Excluir** (laranja) com confirmação; fica cinza e bloqueado enquanto o perfil ativo tiver séries.

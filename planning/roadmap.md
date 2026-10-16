@@ -17,6 +17,9 @@
 > **Estratégia (2026-10-06):** usar o básico por 1–2 meses antes de abrir ao público.
 > As fases P1/P2 são ideias guardadas — só começam quando o usuário decidir.
 
+> **Atualização (2026-10-16):** o dono pediu o descritivo de **Convites por WhatsApp + Comunidade de Pagação + ranking de amigos**.
+> Ver `planning/convites-comunidade.md` (proposta aguardando aprovação; nada implementado).
+
 ## P1 — Hábito e viralização (futuro)
 - Desafio "Pague Dez": mandar um amigo pagar dez via link do WhatsApp
 - Ofensiva (dias seguidos pagando)

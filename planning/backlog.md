@@ -5,7 +5,7 @@
 | Prioridade | Item | Observação |
 |-----------|------|-----------|
 | P0 | Deploy Vercel + domínio | Variáveis: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_TRUST_HOST=true` |
-| P1 | Desafio "Pague Dez" por WhatsApp | Principal motor de viralização |
+| P1 | Convites por WhatsApp, amigos, Comunidade de Pagação e ranking | Descritivo pronto em `planning/convites-comunidade.md`, aguardando decisões |
 | P1 | Ofensiva (streak) | Reforça o uso diário |
 | P1 | Card compartilhável da taça | Imagem gerada com a taça e o recorde |
 | P1 | PWA + notificação diária | "O sargento está esperando suas flecas" |

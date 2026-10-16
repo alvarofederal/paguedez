@@ -1,7 +1,7 @@
 # Releases — Pague Dez
 
 ## v0.3.1 — Excluir perfil (2026-10-16)
-- Botão **Excluir** no painel do admin para limpar perfis que entraram só por curiosidade; exclusão definitiva com limpeza em cadeia
+- Botão **"Expulso a bem da disciplina"** no painel do admin para limpar perfis que entraram só por curiosidade; exclusão definitiva com limpeza em cadeia
 - Travas: admin intocável; perfil com séries só é excluído depois de desativado
 
 ## v0.3.0 — Patentes (2026-10-16)

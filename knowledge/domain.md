@@ -79,4 +79,5 @@ já registrou série acima de 100.
   (como o banco não tem chaves estrangeiras, a limpeza em cadeia é feita à mão, numa transação). Convites que ele aceitou continuam para quem convidou, sem o vínculo.
 - **Travas**: o administrador nunca pode ser excluído (nem por si mesmo); perfil **com séries registradas** só pode ser excluído **depois de desativado** (dois passos,
   porque não tem volta). Perfil que nunca registrou nada (quem entrou só por curiosidade) é excluído direto.
-- Na tela `/admin/usuarios`: botão **Excluir** (laranja) com confirmação; fica cinza e bloqueado enquanto o perfil ativo tiver séries.
+- Na tela `/admin/usuarios`: botão **"Expulso a bem da disciplina"** (laranja) com confirmação; fica cinza e bloqueado enquanto o perfil ativo tiver séries.
+  No celular os botões ficam numa linha embaixo das informações (para não espremer nome e email).

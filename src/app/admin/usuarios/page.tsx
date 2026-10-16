@@ -24,7 +24,7 @@ export default async function UsuariosPage() {
       <ul className="mt-6 space-y-3">
         {usuarios.map((u) => (
           <li key={u.id} className={`adesivo p-4 ${u.ativo ? "" : "bg-[var(--nevoa)] opacity-70"}`}>
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <p className="flex flex-wrap items-center gap-2 font-bold">
                   <span

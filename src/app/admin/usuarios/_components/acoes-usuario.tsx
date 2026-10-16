@@ -27,31 +27,31 @@ export function AcoesUsuario({ userId, nome, email, ativo, series }: Props) {
 
   const excluir = () => {
     const detalhe = series === 0 ? "Esse perfil nunca registrou flecas." : `Esse perfil tem ${series} ${series === 1 ? "série registrada" : "séries registradas"}.`
-    if (!confirm(`Excluir DEFINITIVAMENTE o perfil de ${nome} (${email})?\n\n${detalhe}\nSéries, taças, patentes, amizades e pelotões dele serão apagados. Isso não tem volta.`)) return
+    if (!confirm(`Expulsar a bem da disciplina ${nome} (${email})?\n\n${detalhe}\nO perfil será EXCLUÍDO DEFINITIVAMENTE: séries, taças, patentes, amizades e pelotões dele serão apagados. Isso não tem volta.`)) return
     iniciar(async () => {
       try {
         const { erro } = await adminExcluirUsuario(userId)
         if (erro) toast.error(erro)
-        else toast.success(`Perfil de ${nome} excluído`)
+        else toast.success(`${nome} foi expulso a bem da disciplina`)
       } catch {
-        toast.error("Não foi possível excluir agora. Tente de novo.")
+        toast.error("Não foi possível expulsar agora. Tente de novo.")
       }
     })
   }
 
   return (
-    <div className="flex shrink-0 flex-col gap-2">
-      <button disabled={pendente} className="pilula pilula-fantasma !px-3 !py-1.5 text-xs" onClick={alternar}>
+    <div className="flex shrink-0 gap-2 sm:flex-col">
+      <button disabled={pendente} className="pilula pilula-fantasma !px-3 !py-1.5 text-xs sm:w-full" onClick={alternar}>
         {ativo ? "Desativar" : "Ativar"}
       </button>
       <button
         disabled={pendente || !exclusaoLiberada}
         onClick={excluir}
-        title={exclusaoLiberada ? "Excluir o perfil para sempre" : "Já pagou flecas: desative antes de excluir"}
-        className="pilula !px-3 !py-1.5 text-xs"
+        title={exclusaoLiberada ? "Expulsar a bem da disciplina (exclui o perfil para sempre)" : "Já pagou flecas: desative antes de expulsar"}
+        className="pilula flex-1 !whitespace-normal !px-3 !py-1.5 text-center text-xs leading-tight sm:max-w-[9.5rem] sm:flex-none"
         style={{ background: exclusaoLiberada ? "var(--brasa)" : "var(--nevoa)", color: exclusaoLiberada ? "#fff" : "var(--texto-3)" }}
       >
-        <Trash2 className="h-3.5 w-3.5" /> Excluir
+        <Trash2 className="h-3.5 w-3.5 shrink-0" /> Expulso a bem da disciplina
       </button>
     </div>
   )

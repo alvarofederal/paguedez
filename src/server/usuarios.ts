@@ -58,7 +58,7 @@ export async function excluirUsuario(alvoId: string): Promise<{ erro: string | n
 
   const registros = await prisma.registro.count({ where: { userId: alvoId } })
   if (registros > 0 && alvo.ativo) {
-    return { erro: "Este perfil já registrou flecas. Desative-o primeiro; só então a exclusão é liberada." }
+    return { erro: "Este perfil já registrou flecas. Desative-o primeiro; só então a expulsão é liberada." }
   }
 
   await prisma.$transaction(

@@ -42,6 +42,8 @@ Stack: Next.js 16 (App Router) + TypeScript + MySQL (Prisma 5) + NextAuth v5 (Cr
 11. **Telefone de amigo nunca é gravado por inteiro** (só HMAC + máscara) e o token do convite só existe em hash. Dado de outro usuário só aparece conforme o nível de visibilidade.
 12. Cobrança está **desligada** (`COBRANCA_ATIVA=false`); o que é pago será decidido depois — mexer só em `src/lib/planos.ts`.
 
+13. **Patentes**: números/regras só em `src/lib/patentes.ts` (funções puras, com testes); a patente nunca desce. Ver `planning/patentes.md`.
+
 ## Padrão de Server Action
 
 ```typescript
@@ -68,4 +70,5 @@ npm run build      # prisma generate + db push + next build
 | `/` | Visitante: **landing page** (o que é, como funciona, taças, por que todo dia). Logado: campo de quantidade + botão PAGUEI! + placar do dia/semana/mês/ano |
 | `/historico` | Recordes atuais, gráfico de 30 dias, galeria de taças, últimas séries |
 | `/convidar`, `/tropa`, `/comunidades`, `/emblemas` | **Social** (ver `knowledge/domain.md`): convite por WhatsApp, ranking de amigos, pelotões, emblemas. Públicas: `/convite/[token]`, `/c/[codigo]` |
+| `/patentes` | Escada de patentes (Recruta → Comandante), progresso e regras. Card "Sua patente" na tela Pagar |
 | `/admin/usuarios` | Admin: cadastrar e ativar/desativar usuários (não há promoção a admin) |

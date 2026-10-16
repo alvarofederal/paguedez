@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { ROTULO_PERIODO, TIPOS_PERIODO, type TipoPeriodo } from "@/lib/periodos"
+import { ESCADA, indiceDaPatente, type Patente } from "@/lib/patentes"
 import { faltamParaPassar, type LinhaRanking } from "@/lib/ranking"
 
 /** Abas Hoje / Semana / Mês / Ano (links, sem JavaScript). */
@@ -33,10 +34,13 @@ export function RankingLista({
   linhas,
   euId,
   hrefDe,
+  patentes,
 }: {
   linhas: LinhaRanking[]
   euId: string
   hrefDe?: (userId: string) => string | null
+  /** patente de cada usuário (mostrada em letras pequenas ao lado do nome) */
+  patentes?: Record<string, Patente>
 }) {
   const falta = faltamParaPassar(linhas, euId)
 
@@ -56,6 +60,11 @@ export function RankingLista({
                 {lider && <span aria-label="líder">👑 </span>}
                 {l.name}
                 {euSou && <span className="font-medium"> (você)</span>}
+                {patentes?.[l.userId] && (
+                  <span className="rotulo ml-2 rounded-full border border-black bg-white px-1.5 py-0.5 !text-[10px]" title={ESCADA[indiceDaPatente(patentes[l.userId])].titulo}>
+                    {ESCADA[indiceDaPatente(patentes[l.userId])].abreviacao}
+                  </span>
+                )}
               </span>
               <span className="display text-xl">{l.total}</span>
             </>

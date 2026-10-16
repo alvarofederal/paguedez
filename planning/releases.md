@@ -1,5 +1,10 @@
 # Releases — Pague Dez
 
+## v0.3.0 — Patentes (2026-10-16)
+- 10 patentes (Recruta a Comandante) com insígnias, card de progresso na tela Pagar, tela de promoção e página `/patentes`
+- Regras à prova de clique à toa: dia pago (≥ 10 flecas), teto de 300/dia para patente, dias mínimos, recrutas ativos; patente nunca desce
+- Patente ao lado do nome nos rankings de amigos e pelotões
+
 ## v0.2.2 — Mensagem com link e card do pelotão (2026-10-16)
 - Ao tocar em "Mandar pagar dez no WhatsApp" o link do convite é criado e **colocado dentro da mensagem**; botão **Copiar mensagem (com o link)**
 - Reenviar para o mesmo amigo troca o link velho pelo novo (nunca duplica)

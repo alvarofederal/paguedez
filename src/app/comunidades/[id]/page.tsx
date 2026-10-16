@@ -8,6 +8,7 @@ import { corCss, primeiroNome } from "@/lib/comunidade"
 import { NIVEIS_VISIBILIDADE } from "@/lib/visibilidade"
 import { amigosParaConvocar, obterComunidade } from "@/server/comunidades"
 import { rankingDe } from "@/server/ranking"
+import { patentesDe } from "@/server/patentes"
 import { AcoesMembro } from "./_components/acoes-membro"
 import { ConvocarAmigos } from "./_components/convocar-amigos"
 import { PainelComandante } from "./_components/painel-comandante"
@@ -26,9 +27,10 @@ export default async function PelotaoPage({ params, searchParams }: { params: Pr
   const { comunidade, meuPapel, membros } = dados
   const comandante = meuPapel === "DONO"
 
-  const [linhas, amigosDisponiveis] = await Promise.all([
+  const [linhas, amigosDisponiveis, patentes] = await Promise.all([
     rankingDe(membros.map((m) => m.userId), periodo),
     amigosParaConvocar(usuario.id, id),
+    patentesDe(membros.map((m) => m.userId)),
   ])
   const nivel = NIVEIS_VISIBILIDADE[comunidade.nivelVisibilidade] ?? NIVEIS_VISIBILIDADE[0]
   const linkEntrada = `${await origemDoSite()}/c/${comunidade.codigoEntrada}`
@@ -50,7 +52,7 @@ export default async function PelotaoPage({ params, searchParams }: { params: Pr
       <section>
         <h2 className="rotulo mb-3">Ranking do pelotão</h2>
         <AbasPeriodo base={`/comunidades/${id}`} atual={periodo} />
-        <RankingLista linhas={linhas} euId={usuario.id} hrefDe={(uid) => `/comunidades/${id}/membro/${uid}`} />
+        <RankingLista linhas={linhas} euId={usuario.id} hrefDe={(uid) => `/comunidades/${id}/membro/${uid}`} patentes={patentes} />
         <p className="mt-3 text-center text-xs text-[var(--texto-3)]">
           Neste pelotão os membros veem: <strong>{nivel.titulo.toLowerCase()}</strong> (decisão do comandante).
         </p>

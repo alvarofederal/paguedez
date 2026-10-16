@@ -203,3 +203,27 @@ model Convocacao {
   @@index([convidadoId, status])
   @@map("convocacoes")
 }
+
+// Patentes militares (Recruta → Comandante). Guardamos cada patente conquistada: a patente nunca desce,
+// mesmo que depois o usuário desfaça uma série ou um recruta saia. A atual é a mais alta.
+enum PatenteMilitar {
+  RECRUTA
+  SOLDADO
+  CABO
+  SARGENTO
+  TENENTE
+  CAPITAO
+  MAJOR
+  CORONEL
+  GENERAL
+  COMANDANTE
+}
+
+model PatenteConquistada {
+  userId        String
+  patente       PatenteMilitar
+  conquistadoEm DateTime       @default(now())
+
+  @@id([userId, patente])
+  @@map("patentes_conquistadas")
+}

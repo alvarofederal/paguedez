@@ -16,7 +16,7 @@
 | P1 | PWA + notificação diária | "O sargento está esperando suas flecas" |
 | P1 | Esqueci minha senha | Hoje só o admin pode recriar o usuário |
 | P1 | Editar perfil (nome, sexo, senha) | |
-| P2 | Patentes por volume acumulado | |
+| ✅ | Patentes (Recruta → Comandante) | Entregue em 2026-10-16 — regras propostas em `planning/patentes.md`, aguardando ajuste fino do dono |
 | P2 | Pelotões com ranking | Base para plano pago de academias/cursinhos |
 | P2 | Outros exercícios | Exigirá `exercicio` em `Registro` e `Taca` |
 | P2 | Plano "Oficial" (freemium) | |

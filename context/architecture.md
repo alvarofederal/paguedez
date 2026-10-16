@@ -39,6 +39,10 @@ middleware.ts               # redireciona para /login sem cookie de sessão
 - `middleware.ts` só verifica o cookie (edge, sem banco).
 - Cada página chama `usuarioAtual()`, que confere no banco se o usuário existe e está ativo.
 
+## Patentes (2026-10-16)
+- Regras puras: `src/lib/patentes.ts` (escada, requisitos, progresso). Servidor: `src/server/patentes.ts` (`sincronizarPatente`, `patentesDe`).
+- UI: `insignia`, `barras-progresso`, `patente-card`, `promocao-patente` em `src/components`; página `/patentes`.
+
 ## Camada social (2026-10-16)
 - Regras puras (testáveis, sem banco): `src/lib/{planos,telefone,convites,visibilidade,ranking,emblemas,comunidade,amizade,social-flag}.ts`
   e `limitesDoPeriodo` em `periodos.ts`.

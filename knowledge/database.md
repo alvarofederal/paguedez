@@ -47,3 +47,8 @@ Nenhuma coluna de `users`, `registros` ou `tacas` foi alterada.
 | Tabela | Modelo | Para quê |
 |--------|--------|----------|
 | `convocacoes` | `Convocacao` | comunidadeId, convidadoId, convidanteId, status (PENDENTE/ACEITA/RECUSADA), único por (comunidadeId, convidadoId). Chama para o pelotão um **amigo que já está no app**; ele precisa aceitar. |
+
+### Patentes (adicionada em 2026-10-16)
+| Tabela | Modelo | Para quê |
+|--------|--------|----------|
+| `patentes_conquistadas` | `PatenteConquistada` | PK (userId, patente), conquistadoEm. Guarda cada patente já alcançada: a atual é a mais alta e **nunca desce**. Enum `PatenteMilitar`. |

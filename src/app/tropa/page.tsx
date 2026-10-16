@@ -1,11 +1,12 @@
 import Link from "next/link"
-import { Award, Send, Users } from "lucide-react"
+import { Award, Medal, Send, Users } from "lucide-react"
 import { exigirUsuarioSocial } from "@/server/social"
 import { AppShell } from "@/components/app-shell"
 import { AbasPeriodo, periodoDaUrl, RankingLista } from "@/components/ranking-lista"
 import { listarAmigos } from "@/server/amizades"
 import { listarConvocacoes } from "@/server/comunidades"
 import { rankingDe } from "@/server/ranking"
+import { patentesDe } from "@/server/patentes"
 import { AmigoConfig } from "./_components/amigo-config"
 
 export const dynamic = "force-dynamic"
@@ -14,6 +15,7 @@ export const metadata = { title: "Tropa" }
 const ATALHOS = [
   { href: "/convidar", titulo: "Mandar pagar dez", texto: "Chame um amigo pelo WhatsApp", icone: Send, cor: "var(--menta)" },
   { href: "/comunidades", titulo: "Pelotões", texto: "Comunidades de Pagação", icone: Users, cor: "var(--lavanda)" },
+  { href: "/patentes", titulo: "Patentes", texto: "De Recruta a Comandante", icone: Medal, cor: "var(--chiclete)" },
   { href: "/emblemas", titulo: "Emblemas", texto: "Suas conquistas", icone: Award, cor: "var(--sol)" },
 ]
 
@@ -22,7 +24,8 @@ export default async function TropaPage({ searchParams }: { searchParams: Promis
   const periodo = periodoDaUrl((await searchParams).p)
 
   const [amigos, convocacoes] = await Promise.all([listarAmigos(usuario.id), listarConvocacoes(usuario.id)])
-  const linhas = await rankingDe([usuario.id, ...amigos.map((a) => a.userId)], periodo)
+  const idsDoRanking = [usuario.id, ...amigos.map((a) => a.userId)]
+  const [linhas, patentes] = await Promise.all([rankingDe(idsDoRanking, periodo), patentesDe(idsDoRanking)])
 
   return (
     <AppShell usuario={usuario}>
@@ -37,7 +40,7 @@ export default async function TropaPage({ searchParams }: { searchParams: Promis
         </Link>
       )}
 
-      <ul className="grid gap-3 sm:grid-cols-3">
+      <ul className="grid gap-3 sm:grid-cols-2">
         {ATALHOS.map(({ href, titulo, texto, icone: Icone, cor }) => (
           <li key={href}>
             <Link href={href} className="flex items-center gap-3 rounded-[20px] border border-black p-4 transition hover:brightness-95 sm:flex-col sm:items-start" style={{ background: cor }}>
@@ -63,7 +66,7 @@ export default async function TropaPage({ searchParams }: { searchParams: Promis
             <Link href="/convidar" className="pilula pilula-cheia">Mandar pagar dez</Link>
           </div>
         ) : (
-          <RankingLista linhas={linhas} euId={usuario.id} hrefDe={(id) => `/tropa/${id}`} />
+          <RankingLista linhas={linhas} euId={usuario.id} hrefDe={(id) => `/tropa/${id}`} patentes={patentes} />
         )}
       </section>
 

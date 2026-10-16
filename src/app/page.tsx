@@ -4,6 +4,9 @@ import { usuarioAtual } from "@/lib/auth"
 import { socialAtivo } from "@/lib/social-flag"
 import { painelDoDia } from "@/server/flexoes"
 import { listarMinhasComunidades } from "@/server/comunidades"
+import { sincronizarPatente } from "@/server/patentes"
+import { PatenteCard } from "@/components/patente-card"
+import { PromocaoPatente } from "@/components/promocao-patente"
 import { AppShell } from "@/components/app-shell"
 import { Taca } from "@/components/taca"
 import { PlacarPeriodos } from "@/components/placar-periodos"
@@ -19,10 +22,17 @@ export default async function InicioPage() {
   if (!usuario) return <Landing /> // visitante: landing page pública
 
   const social = socialAtivo()
-  const [{ resumo, seriesHoje, ultimaTaca }, pelotoes] = await Promise.all([
+  const [{ resumo, seriesHoje, ultimaTaca }, pelotoes, patente] = await Promise.all([
     painelDoDia(usuario.id),
     social ? listarMinhasComunidades(usuario.id) : Promise.resolve([]),
+    // A patente é um extra: se falhar, a tela principal continua funcionando normalmente
+    sincronizarPatente(usuario.id).catch((erro) => {
+      console.error("Falha ao sincronizar a patente:", erro)
+      return null
+    }),
   ])
+  // Comemora só a maior patente conquistada AGORA (Recruta, a inicial, não tem festa)
+  const promovido = patente?.novas.filter((p) => p.patente !== "RECRUTA").at(-1)
 
   return (
     <AppShell usuario={usuario}>
@@ -31,6 +41,9 @@ export default async function InicioPage() {
       </section>
 
       <PlacarPeriodos resumo={resumo} />
+
+      {patente && <PatenteCard atual={patente.atual} progresso={patente.progresso} />}
+      {promovido && <PromocaoPatente patente={promovido.patente} titulo={promovido.titulo} lema={promovido.lema} />}
 
       {socialAtivo() && (
         <section className="mt-4 flex flex-col gap-3 rounded-[20px] border border-black bg-[var(--violeta)] p-4 text-white sm:flex-row sm:items-center sm:justify-between">

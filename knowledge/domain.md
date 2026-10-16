@@ -66,3 +66,10 @@ já registrou série acima de 100.
   comandante definiu, então o amigo vê **o que será visível** e **aceita ou recusa** em `/comunidades` (aviso também em `/tropa`).
 - Só amigos podem ser chamados; quem **recusou** não é incomodado de novo; quem aceitou e depois saiu pode ser chamado outra vez; excluir o pelotão apaga as convocações.
 - O item **Pelotão** do menu só aparece depois que o usuário é de algum pelotão (um só: vai direto a ele; vários: lista). Criar/entrar continua em **Tropa**.
+
+## Patentes (regras completas em `planning/patentes.md`; números em `src/lib/patentes.ts`)
+- 10 patentes: Recruta, Soldado, Cabo, Sargento, Tenente, Capitão, Major, Coronel, General, Comandante.
+- A patente é **calculada** a partir dos registros (`sincronizarPatente`) e guardada; só sobe, nunca desce.
+- Requisitos por patente: **flecas válidas** (teto de 300 por dia), **dias pagos** (≥ 10 flecas no dia) e, de Sargento em diante, **recrutas ativos**
+  (amigos que aceitaram o convite e pagaram em 3 dias diferentes). Sem o social ligado, a exigência de recrutas é ignorada.
+- A sincronização roda ao abrir a tela Pagar (falha ali não quebra a tela) e `/patentes`; a promoção é comemorada uma única vez (`novas`).

@@ -81,3 +81,9 @@ já registrou série acima de 100.
   porque não tem volta). Perfil que nunca registrou nada (quem entrou só por curiosidade) é excluído direto.
 - Na tela `/admin/usuarios`: botão **"Expulso a bem da disciplina"** (laranja) com confirmação; fica cinza e bloqueado enquanto o perfil ativo tiver séries.
   No celular os botões ficam numa linha embaixo das informações (para não espremer nome e email).
+
+## Lembretes por push (detalhes em `planning/lembretes-push.md`)
+- Cada usuário tem até 10 lembretes (horário + dias da semana). O executor (`executarLembretes`) dispara cada lembrete **no máximo uma vez por dia**, só dentro de
+  **120 minutos** depois do horário marcado, e pula quem **já pagou flecas hoje** (opção "só se ainda não paguei", ligada por padrão).
+- A mensagem usa a patente como tratamento e, se o lembrete não for "só pendente" e já houver flecas no dia, mostra quanto falta para o recorde diário.
+- Entrega por **Web Push (VAPID)**, gratuita e sem Firebase. Aparelho cuja inscrição o serviço de push recusa (404/410) é removido automaticamente.

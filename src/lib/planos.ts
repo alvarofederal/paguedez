@@ -23,3 +23,14 @@ export function limiteDeAmigos(plano: Plano = "GRATIS", cobrancaAtiva: boolean =
   if (!cobrancaAtiva || plano === "OFICIAL") return null
   return LIMITES_SOCIAL.amigosGratis
 }
+
+/**
+ * Lembretes (push). Hoje liberados para todos. Quando houver cobrança, a ideia é o grátis ter 1 lembrete e o plano
+ * pago a agenda completa — mude só `porUsuario` (e uma função como `limiteDeAmigos`) para fazer essa separação.
+ */
+export const LIMITES_LEMBRETES = {
+  porUsuario: 10,
+  /** Janela, em minutos, depois do horário marcado em que o lembrete ainda vale (cobre atraso do agendador). */
+  toleranciaMinutos: 120,
+  intervaloTesteSeg: 15,
+} as const

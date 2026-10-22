@@ -43,3 +43,11 @@
 | `responderConvocacaoAction(id, aceitar)` | o convidado | aceita (entra no pelotão) ou recusa |
 
 | `adminExcluirUsuario(userId)` | ADMIN | exclui o perfil definitivamente (ver `knowledge/domain.md`); `{ erro }` |
+
+## Lembretes (push)
+| Item | Quem | O que faz |
+|------|------|-----------|
+| `GET/POST /api/lembretes/executar` | agendador (`Authorization: Bearer $CRON_SECRET`) | roda o executor; 401 sem a senha; devolve o resumo (`avaliados`, `enviados`, `jaPagaram`...) |
+| `salvarInscricaoAction`, `removerInscricaoAction` | logado | liga/desliga o aparelho atual |
+| `enviarTesteAction` | logado | notificação de teste (intervalo de 15 s) |
+| `criarLembreteAction`, `atualizarLembreteAction`, `excluirLembreteAction` | logado (dono) | CRUD da agenda |

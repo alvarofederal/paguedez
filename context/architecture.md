@@ -39,6 +39,11 @@ middleware.ts               # redireciona para /login sem cookie de sessão
 - `middleware.ts` só verifica o cookie (edge, sem banco).
 - Cada página chama `usuarioAtual()`, que confere no banco se o usuário existe e está ativo.
 
+## Lembretes / push (2026-10-22)
+- Regras puras: `src/lib/lembretes.ts`. Servidor: `src/server/push.ts` (envio, inscrições) e `src/server/lembretes.ts` (agenda, executor, teste).
+- Navegador: `public/sw.js` (service worker), `src/app/manifest.ts` (PWA), `src/app/icone-pwa/[tamanho]/route.ts` (ícones), `src/lib/push-cliente.ts`.
+- Páginas/rotas: `/lembretes` e `/api/lembretes/executar` (agendador).
+
 ## Patentes (2026-10-16)
 - Regras puras: `src/lib/patentes.ts` (escada, requisitos, progresso). Servidor: `src/server/patentes.ts` (`sincronizarPatente`, `patentesDe`).
 - UI: `insignia`, `barras-progresso`, `patente-card`, `promocao-patente` em `src/components`; página `/patentes`.

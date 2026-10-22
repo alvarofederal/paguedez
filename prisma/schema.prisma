@@ -227,3 +227,61 @@ model PatenteConquistada {
   @@id([userId, patente])
   @@map("patentes_conquistadas")
 }
+
+// ─────────────────────────────────────────────────────────────
+// LEMBRETES — push notification para avisar a hora das flecas
+// ─────────────────────────────────────────────────────────────
+
+// Um aparelho/navegador que aceitou receber notificações (Web Push, padrão aberto: sem Firebase e sem custo).
+model PushInscricao {
+  id            String    @id @default(cuid())
+  userId        String
+  endpointHash  String    @unique @db.VarChar(64) // SHA-256 do endpoint (índice único em coluna TEXT não é possível)
+  endpoint      String    @db.Text
+  p256dh        String    @db.VarChar(255)
+  auth          String    @db.VarChar(255)
+  agente        String?   @db.VarChar(160)
+  criadoEm      DateTime  @default(now())
+  ultimoTesteEm DateTime?
+
+  @@index([userId])
+  @@map("push_inscricoes")
+}
+
+// Item da agenda do usuário: "todo dia às 19:00, se eu ainda não paguei".
+// diasSemana é uma máscara de bits: bit 0 = segunda ... bit 6 = domingo (127 = todos os dias).
+model Lembrete {
+  id                String   @id @default(cuid())
+  userId            String
+  hora              String   @db.VarChar(5) // "HH:MM", horário de Brasília
+  diasSemana        Int      @default(127)
+  somenteSePendente Boolean  @default(true)
+  ativo             Boolean  @default(true)
+  criadoEm          DateTime @default(now())
+
+  @@index([userId])
+  @@index([ativo])
+  @@map("lembretes")
+}
+
+enum StatusEnvioLembrete {
+  PROCESSANDO
+  ENVIADO
+  IGNORADO_JA_PAGOU
+  SEM_INSCRICAO
+  FALHOU
+}
+
+// Um registro por (lembrete, dia): garante que o mesmo lembrete nunca dispara duas vezes no mesmo dia,
+// mesmo que duas execuções do agendador se sobreponham (a chave única faz de "trava").
+model LembreteEnvio {
+  id         String              @id @default(cuid())
+  lembreteId String
+  dia        String              @db.VarChar(10)
+  status     StatusEnvioLembrete @default(PROCESSANDO)
+  detalhe    String?             @db.VarChar(200)
+  criadoEm   DateTime            @default(now())
+
+  @@unique([lembreteId, dia])
+  @@map("lembrete_envios")
+}

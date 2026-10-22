@@ -52,3 +52,10 @@ Nenhuma coluna de `users`, `registros` ou `tacas` foi alterada.
 | Tabela | Modelo | Para quê |
 |--------|--------|----------|
 | `patentes_conquistadas` | `PatenteConquistada` | PK (userId, patente), conquistadoEm. Guarda cada patente já alcançada: a atual é a mais alta e **nunca desce**. Enum `PatenteMilitar`. |
+
+### Lembretes / push (adicionadas em 2026-10-22)
+| Tabela | Modelo | Para quê |
+|--------|--------|----------|
+| `push_inscricoes` | `PushInscricao` | um aparelho/navegador inscrito no push: endpoint (+ hash único), chaves p256dh/auth, ultimoTesteEm |
+| `lembretes` | `Lembrete` | item da agenda: hora "HH:MM" (Brasília), diasSemana (máscara: bit 0 = segunda ... bit 6 = domingo, 127 = todos), somenteSePendente, ativo |
+| `lembrete_envios` | `LembreteEnvio` | uma linha por (lembrete, dia) — chave única que impede envio duplicado; status PROCESSANDO/ENVIADO/IGNORADO_JA_PAGOU/SEM_INSCRICAO/FALHOU |

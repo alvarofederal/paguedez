@@ -36,3 +36,14 @@ export const comunidadeSchema = z.object({
 
 export const idSchema = z.string().trim().min(1).max(64)
 export const tokenSchema = z.string().trim().regex(/^[A-Za-z0-9_-]{6,64}$/, "Link inválido")
+
+export const inscricaoPushSchema = z.object({
+  endpoint: z.string().url().startsWith("https://", "Endereço de push inválido").max(2000),
+  keys: z.object({ p256dh: z.string().min(10).max(255), auth: z.string().min(10).max(255) }),
+})
+
+export const lembreteSchema = z.object({
+  hora: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Horário inválido"),
+  diasSemana: z.number().int().min(1, "Escolha pelo menos um dia").max(127),
+  somenteSePendente: z.boolean(),
+})

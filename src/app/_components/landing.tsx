@@ -213,6 +213,37 @@ export function Landing() {
         </p>
       </Secao>
 
+      {/* Lembretes (push) */}
+      <Secao fundo="var(--lavanda)">
+        <div className="grid items-center gap-8 md:grid-cols-[1fr_auto]">
+          <div>
+            <h2 className="display text-[56px] sm:text-[88px]">
+              Lembrete
+              <br />
+              no celular
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg font-medium">
+              Escolha os horários e os dias da semana e o Pague Dez avisa por <strong>notificação</strong>, com o app fechado. Se você já pagou as flecas do
+              dia, o aviso nem chega: ninguém te enche à toa.
+            </p>
+            <ul className="mt-5 space-y-1.5 font-medium">
+              <li>Vários lembretes por dia, cada um com seus dias da semana.</li>
+              <li>Funciona no Android, no computador e no iPhone.</li>
+              <li>
+                <strong>iPhone:</strong> é preciso adicionar o Pague Dez à Tela de Início (regra da Apple para qualquer site).
+              </li>
+            </ul>
+          </div>
+          <div className={`mx-auto w-full max-w-[280px] rounded-[28px] ${contorno} bg-white p-4 md:mx-0`} aria-hidden="true">
+            <p className="rotulo text-[10px] text-[var(--texto-3)]">Agora</p>
+            <div className={`mt-2 rounded-[18px] ${contorno} bg-[var(--sol)] p-3`}>
+              <p className="text-sm font-bold">Pague Dez</p>
+              <p className="text-sm font-medium">Cabo, você ainda não pagou nenhuma fleca hoje. Que tal dez agora?</p>
+            </div>
+          </div>
+        </div>
+      </Secao>
+
       {/* Chame a tropa (social) */}
       <Secao fundo="var(--nevoa)">
         <h2 className="display text-[56px] sm:text-[88px]">

@@ -44,6 +44,8 @@ Stack: Next.js 16 (App Router) + TypeScript + MySQL (Prisma 5) + NextAuth v5 (Cr
 
 13. **Patentes**: números/regras só em `src/lib/patentes.ts` (funções puras, com testes); a patente nunca desce. Ver `planning/patentes.md`.
 
+14. **Push**: segredos só em variáveis de ambiente (nunca no código); o endpoint do agendador fica fechado sem `CRON_SECRET`; regras de quando disparar são puras em `src/lib/lembretes.ts` (com testes) e o executor em `src/server/lembretes.ts`.
+
 ## Padrão de Server Action
 
 ```typescript
@@ -71,4 +73,5 @@ npm run build      # prisma generate + db push + next build
 | `/historico` | Recordes atuais, gráfico de 30 dias, galeria de taças, últimas séries |
 | `/convidar`, `/tropa`, `/comunidades`, `/emblemas` | **Social** (ver `knowledge/domain.md`): convite por WhatsApp, ranking de amigos, pelotões, emblemas. Públicas: `/convite/[token]`, `/c/[codigo]` |
 | `/patentes` | Escada de patentes (Recruta → Comandante), progresso e regras. Card "Sua patente" na tela Pagar |
+| `/lembretes` | Lembretes por notificação push: ativar o aparelho, teste, agenda (horários e dias). Ver `planning/lembretes-push.md` |
 | `/admin/usuarios` | Admin: cadastrar e ativar/desativar usuários (não há promoção a admin) |

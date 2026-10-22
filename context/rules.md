@@ -9,6 +9,8 @@
 - Cores apenas via tokens CSS de `globals.css`.
 
 ## Nunca
+- Nunca versionar `VAPID_PRIVATE_KEY` nem `CRON_SECRET`. Trocar as chaves VAPID derruba todas as inscrições de push existentes.
+- Nunca enviar push sem passar por `executarLembretes`/`enviarTeste` (travas de dia, janela, duplicidade e intervalo). O service worker (`public/sw.js`) sempre mostra uma notificação ao receber push (exigência dos navegadores).
 - Nunca excluir usuário por `prisma.user.delete` solto: use `excluirUsuario` (limpa tudo em cadeia e aplica as travas). Testes de exclusão NUNCA apontam para o admin real (mockar `@/lib/admin`).
 - Nunca trocar a página do app por um link externo (`window.location`) para abrir o WhatsApp: deixa tela em branco ao voltar. Use `abrirWhatsapp()` (`src/lib/abrir-whatsapp.ts`: outra aba) e mantenha o botão de reserva na tela.
 - Nunca deixar uma ação do cliente sem `try/catch/finally`: erro de servidor não pode deixar o botão girando nem a tela em branco (há `src/app/error.tsx` como rede de segurança).

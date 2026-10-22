@@ -6,7 +6,9 @@
 |-----------|------|-----------|
 | P0 | Deploy Vercel + domínio | Variáveis: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_TRUST_HOST=true` |
 | ✅ | Convites por WhatsApp, amigos, pelotões, ranking e emblemas | Entregue em 2026-10-16 (`planning/convites-comunidade.md`) |
-| P1 | Cutucar amigo que não pagou hoje | Ideia da seção 11 do descritivo |
+| ✅ | Lembretes por push | Entregue em 2026-10-22 (`planning/lembretes-push.md`); o que é pago fica para decidir depois |
+| P1 | Lembrete insistente (repete até pagar) e avisos do pelotão por push | Usa a mesma infraestrutura |
+| P1 | Cutucar amigo que não pagou hoje | Ideia da seção 11 do descritivo (agora pode usar push) |
 | P1 | Mensagens prontas extras e QR code do pelotão | |
 | P1 | Campeão da semana (taça de comunidade) e meta coletiva | |
 | P2 | Duelo semanal 1×1, rankings por dias seguidos | |

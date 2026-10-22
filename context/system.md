@@ -27,6 +27,8 @@ Uso em segundos: abrir → número → **PAGUEI!** → (talvez) comemorar um rec
 | `DATABASE_URL` | MySQL do Pague Dez |
 | `AUTH_SECRET` | Assinatura do JWT da sessão |
 | `AUTH_TRUST_HOST` | `true` na Vercel |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | chaves do Web Push (gerar com `npx web-push generate-vapid-keys`); trocar invalida as inscrições |
+| `CRON_SECRET` | senha do agendador: o endpoint `/api/lembretes/executar` só responde com `Authorization: Bearer <valor>` |
 | `FEATURE_SOCIAL` | opcional; `false` desliga convites/amigos/pelotões/emblemas (padrão: ligado) |
 | `COBRANCA_ATIVA` | opcional; `true` liga o limite de amigos do plano grátis (padrão: desligado) |
 | `CONVITE_SECRET` | opcional; segredo do HMAC do telefone (se ausente, usa `AUTH_SECRET`) |

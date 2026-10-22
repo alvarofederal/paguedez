@@ -27,6 +27,10 @@
 - [x] Emblemas (inclui Recrutador) e página de emblemas
 - [ ] Cobrança / planos (decisão do dono: depois de ver o uso)
 
+## Lembretes por push — v0.4 (implementado em 2026-10-22)
+- [x] Web Push gratuito, agenda de lembretes, app instalável; ver `planning/lembretes-push.md`
+- [ ] Configurar o agendador externo (cron-job.org) para horários livres; decidir o que é pago
+
 ## Patentes — v0.3 (implementado em 2026-10-16)
 - [x] 10 patentes com regras anti-clique-à-toa (ver `planning/patentes.md`)
 - [ ] Ajustar números com o dono após uso real; patente render benefícios (combinar com o que é pago)

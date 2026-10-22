@@ -78,6 +78,10 @@ export async function excluirUsuario(alvoId: string): Promise<{ erro: string | n
       await tx.convite.deleteMany({ where: { convidanteId: alvoId } })
       // convites que ele aceitou continuam existindo para quem convidou, só sem ligação com a conta apagada
       await tx.convite.updateMany({ where: { aceitoPorId: alvoId }, data: { aceitoPorId: null } })
+      const lembretes = (await tx.lembrete.findMany({ where: { userId: alvoId }, select: { id: true } })).map((l) => l.id)
+      await tx.lembreteEnvio.deleteMany({ where: { lembreteId: { in: lembretes } } })
+      await tx.lembrete.deleteMany({ where: { userId: alvoId } })
+      await tx.pushInscricao.deleteMany({ where: { userId: alvoId } })
       await tx.patenteConquistada.deleteMany({ where: { userId: alvoId } })
       await tx.emblema.deleteMany({ where: { userId: alvoId } })
       await tx.taca.deleteMany({ where: { userId: alvoId } })

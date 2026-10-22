@@ -1,5 +1,11 @@
 # Releases — Pague Dez
 
+## v0.4.0 — Lembretes por push (2026-10-22)
+- Notificações push gratuitas (Web Push/VAPID): agenda com vários horários e dias da semana, "só se ainda não paguei", teste de notificação
+- App instalável (manifest + ícones) — necessário para o push no iPhone
+- Agendador: endpoint protegido `/api/lembretes/executar` + cron diário da Vercel (plano Hobby) + agendador externo gratuito recomendado
+- Card na tela Pagar e seção na landing
+
 ## v0.3.1 — Excluir perfil (2026-10-16)
 - Botão **"Expulso a bem da disciplina"** no painel do admin para limpar perfis que entraram só por curiosidade; exclusão definitiva com limpeza em cadeia
 - Travas: admin intocável; perfil com séries só é excluído depois de desativado

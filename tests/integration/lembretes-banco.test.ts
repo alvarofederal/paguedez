@@ -12,11 +12,11 @@ const ids: Record<string, string> = {}
 const SEG_19H05 = new Date("2026-10-22T22:05:00Z")
 const DIA = diaBrasilia(SEG_19H05)
 
-type Chamada = { userId: string; corpo: string }
+type Chamada = { userId: string; titulo: string; corpo: string }
 function fingir(retorno: Entrega) {
   const chamadas: Chamada[] = []
-  const enviar = async (userId: string, payload: { corpo: string }) => {
-    chamadas.push({ userId, corpo: payload.corpo })
+  const enviar = async (userId: string, payload: { titulo: string; corpo: string }) => {
+    chamadas.push({ userId, titulo: payload.titulo, corpo: payload.corpo })
     return retorno
   }
   return { chamadas, enviar: enviar as never }
@@ -108,7 +108,7 @@ describe("executar lembretes", () => {
     const f2 = fingir(ENVIADO)
     await executarLembretes(SEG_19H05, f2.enviar)
     const paraD = f2.chamadas.find((c) => c.userId === ids.d)
-    expect(paraD?.corpo).toMatch(/hoje você já pagou 30/i)
+    expect(paraD?.titulo).toMatch(/hoje você já pagou 30/i)
   })
 
   it("fora da janela, fora do dia da semana, inativo ou usuário desativado: não envia", async () => {

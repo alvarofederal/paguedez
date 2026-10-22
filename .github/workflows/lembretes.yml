@@ -1,0 +1,35 @@
+# Agendador dos lembretes por notificação push.
+# A Vercel (plano Hobby) só roda cron uma vez por dia; este workflow chama o executor a cada 5 minutos, de graça.
+# O executor é idempotente: cada lembrete dispara no máximo uma vez por dia, dentro da janela do horário marcado.
+#
+# Precisa do secret CRON_SECRET (o mesmo valor da variável CRON_SECRET na Vercel):
+#   GitHub → Settings → Secrets and variables → Actions → New repository secret
+
+name: Lembretes
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: lembretes
+  cancel-in-progress: false
+
+jobs:
+  disparar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Chamar o executor de lembretes
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::O secret CRON_SECRET não está configurado neste repositório."
+            exit 1
+          fi
+          curl --fail-with-body --silent --show-error --max-time 60 --retry 2 --retry-delay 5 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "https://paguedez.vercel.app/api/lembretes/executar"
+          echo

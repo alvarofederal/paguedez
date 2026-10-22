@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
-  agoraEmBrasilia, alternarDia, avaliarLembrete, horaValida, indiceDiaSemana, mascaraValida, minutosDeHora, montarMensagem,
+  agoraEmBrasilia, alternarDia, avaliarLembrete, horaValida, indiceDiaSemana, mascaraValida, minutosDeHora, montarMensagem, IMAGEM_NOTIFICACAO, temaPorSexo,
   naJanela, ordenarPorHora, temDia, TODOS_OS_DIAS,
 } from "@/lib/lembretes"
 
@@ -78,16 +78,36 @@ describe("mensagem", () => {
     const a = montarMensagem({ totalHoje: 0, recordeDiario: 40, semente: 0 })
     const b = montarMensagem({ totalHoje: 0, recordeDiario: 40, semente: 1 })
     expect(a.corpo).not.toBe(b.corpo)
-    expect(a).toMatchObject({ titulo: "Pague Dez", url: "/", tag: "lembrete-pague-dez" })
+    expect(a).toMatchObject({ titulo: "Hora de pagar dez!", url: "/", tag: "lembrete-pague-dez" })
   })
 
-  it("trata pela patente e mantém a frase correta", () => {
-    expect(montarMensagem({ totalHoje: 0, recordeDiario: 0, semente: 0, tratamento: "Cabo" }).corpo).toBe("Cabo, você ainda não pagou nenhuma fleca hoje. Que tal dez agora?")
+  it("o título leva o tratamento pela patente e o corpo não repete", () => {
+    const m = montarMensagem({ totalHoje: 0, recordeDiario: 0, semente: 0, tratamento: "Cabo" })
+    expect(m.titulo).toBe("Cabo, hora de pagar dez!")
+    expect(m.corpo).toBe("Você ainda não pagou nenhuma fleca hoje. Que tal dez agora?")
   })
 
   it("com flecas: mostra quanto falta para o recorde ou incentiva a ir além", () => {
-    expect(montarMensagem({ totalHoje: 30, recordeDiario: 50, semente: 0 }).corpo).toBe("Hoje você já pagou 30. Faltam 21 para bater o seu recorde diário.")
-    expect(montarMensagem({ totalHoje: 60, recordeDiario: 50, semente: 0 }).corpo).toBe("Hoje você já pagou 60. Quer ir além?")
+    const perto = montarMensagem({ totalHoje: 30, recordeDiario: 50, semente: 0 })
+    expect(perto.titulo).toBe("Faltam 21 para o recorde")
+    expect(perto.corpo).toBe("Hoje você já pagou 30. Seu recorde diário é 50.")
+
+    const alem = montarMensagem({ totalHoje: 60, recordeDiario: 50, semente: 0, tratamento: "Sargento" })
+    expect(alem.titulo).toBe("Sargento, hoje você já pagou 60")
+    expect(alem.corpo).toBe("Esse é o seu melhor dia até agora. Quer ir além?")
+  })
+
+  it("leva a imagem do tema (azul por padrão, rosa para o público feminino) e os botões", () => {
+    expect(montarMensagem({ totalHoje: 0, recordeDiario: 0, semente: 0 }).imagem).toBe(IMAGEM_NOTIFICACAO.azul)
+    const rosa = montarMensagem({ totalHoje: 0, recordeDiario: 0, semente: 0, tema: temaPorSexo("FEMININO") })
+    expect(rosa.imagem).toBe(IMAGEM_NOTIFICACAO.rosa)
+    expect(rosa.acoes?.map((a) => a.acao)).toEqual(["pagar", "depois"])
+  })
+
+  it("o tema segue o sexo: só FEMININO vira rosa", () => {
+    expect(temaPorSexo("FEMININO")).toBe("rosa")
+    expect(temaPorSexo("MASCULINO")).toBe("azul")
+    expect(temaPorSexo(null)).toBe("azul")
   })
 })
 

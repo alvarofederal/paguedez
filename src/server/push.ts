@@ -57,8 +57,9 @@ export async function enviarPush(userId: string, payload: PayloadPush): Promise<
         await webpush.sendNotification(
           { endpoint: i.endpoint, keys: { p256dh: i.p256dh, auth: i.auth } },
           JSON.stringify(payload),
-          // TTL de 1h: se o aparelho estiver desligado por mais que isso, o lembrete já perdeu o sentido
-          { TTL: 60 * 60, urgency: "normal" }
+          // TTL de 1h: se o aparelho estiver desligado por mais que isso, o lembrete já perdeu o sentido.
+          // Urgência alta: com "normal" o Android em economia de bateria segura a mensagem até o aparelho acordar.
+          { TTL: 60 * 60, urgency: "high" }
         )
         resultado.enviadas++
       } catch (erro) {

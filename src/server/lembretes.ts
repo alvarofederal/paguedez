@@ -8,8 +8,10 @@ import {
   avaliarLembrete,
   horaValida,
   mascaraValida,
+  IMAGEM_NOTIFICACAO,
   montarMensagem,
   naJanela,
+  temaPorSexo,
   ordenarPorHora,
   type PayloadPush,
 } from "@/lib/lembretes"
@@ -64,11 +66,13 @@ export async function enviarTeste(userId: string, agora = new Date(), enviar: ty
   if (recente) return { erro: `Aguarde ${LIMITES_LEMBRETES.intervaloTesteSeg} segundos entre um teste e outro.` }
   await prisma.pushInscricao.updateMany({ where: { userId }, data: { ultimoTesteEm: agora } })
 
+  const usuario = await prisma.user.findUnique({ where: { id: userId }, select: { sexo: true } })
   const r = await enviar(userId, {
     titulo: "Teste do Pague Dez",
     corpo: "Se você está vendo isto, os lembretes funcionam neste aparelho.",
     url: "/lembretes",
     tag: "teste-pague-dez",
+    imagem: IMAGEM_NOTIFICACAO[temaPorSexo(usuario?.sexo)],
   })
   if (r.enviadas === 0) return { erro: "Não consegui entregar a notificação. Desative e ative o aparelho de novo.", ...r }
   return { erro: null, ...r }
@@ -104,12 +108,13 @@ export async function executarLembretes(agora = new Date(), enviar: typeof envia
 
   const userIds = [...new Set(naHora.map((l) => l.userId))]
   const [usuarios, totais, jaProcessados, patentes] = await Promise.all([
-    prisma.user.findMany({ where: { id: { in: userIds }, ativo: true }, select: { id: true } }),
+    prisma.user.findMany({ where: { id: { in: userIds }, ativo: true }, select: { id: true, sexo: true } }),
     prisma.registro.groupBy({ by: ["userId"], where: { userId: { in: userIds }, dia }, _sum: { quantidade: true } }),
     prisma.lembreteEnvio.findMany({ where: { lembreteId: { in: naHora.map((l) => l.id) }, dia }, select: { lembreteId: true } }),
     patentesDe(userIds),
   ])
   const usuarioAtivo = new Set(usuarios.map((u) => u.id))
+  const sexoDe = new Map(usuarios.map((u) => [u.id, u.sexo]))
   const totalHoje = new Map(totais.map((t) => [t.userId, t._sum.quantidade ?? 0]))
   const processados = new Set(jaProcessados.map((p) => p.lembreteId))
   const semente = Math.floor(agora.getTime() / 86_400_000)
@@ -140,6 +145,7 @@ export async function executarLembretes(agora = new Date(), enviar: typeof envia
       recordeDiario: total > 0 ? await recordeDiario(l.userId) : 0,
       tratamento: ESCADA[indiceDaPatente(patentes[l.userId] ?? "RECRUTA")].titulo,
       semente,
+      tema: temaPorSexo(sexoDe.get(l.userId)),
     })
 
     const entrega = await enviar(l.userId, payload).catch((erro) => {

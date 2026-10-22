@@ -69,32 +69,64 @@ export function avaliarLembrete(
   return "ENVIAR"
 }
 
-export type PayloadPush = { titulo: string; corpo: string; url: string; tag: string }
+export type TemaNotificacao = "azul" | "rosa"
+export type AcaoNotificacao = { acao: string; titulo: string }
+export type PayloadPush = { titulo: string; corpo: string; url: string; tag: string; imagem?: string; acoes?: AcaoNotificacao[] }
+
+/** Mesma regra do tema do app: azul (padrão) ou rosa (feminino). */
+export function temaPorSexo(sexo: string | null | undefined): TemaNotificacao {
+  return sexo === "FEMININO" ? "rosa" : "azul"
+}
+
+// O número no fim do endereço só serve para o navegador buscar de novo quando o desenho mudar
+export const IMAGEM_NOTIFICACAO: Record<TemaNotificacao, string> = {
+  azul: "/icone-pwa/banner-azul?v=1",
+  rosa: "/icone-pwa/banner-rosa?v=1",
+}
+
+/** Botões da notificação (Android e desktop; o iPhone ignora). "depois" só fecha, o resto abre o app. */
+export const ACOES_LEMBRETE: AcaoNotificacao[] = [
+  { acao: "pagar", titulo: "Pagar agora" },
+  { acao: "depois", titulo: "Mais tarde" },
+]
 
 const SEM_FLECAS = [
   "Você ainda não pagou nenhuma fleca hoje. Que tal dez agora?",
   "O sargento está esperando: pague dez e registre no app.",
-  "Hora de pagar suas flecas. Leva menos de um minuto.",
+  "Leva menos de um minuto: pague suas flecas e registre no app.",
 ]
 
-/** Texto do lembrete. `semente` (ex.: dia do ano) varia a frase sem ser aleatório, para ser testável. */
-export function montarMensagem(c: { totalHoje: number; recordeDiario: number; tratamento?: string; semente: number }): PayloadPush {
+const capitalizar = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
+
+/**
+ * Texto do lembrete. `semente` (ex.: dia do ano) varia a frase sem ser aleatório, para ser testável.
+ * O título leva o tratamento (a patente) e diz o que fazer; o corpo dá o número que importa.
+ */
+export function montarMensagem(c: { totalHoje: number; recordeDiario: number; tratamento?: string; semente: number; tema?: TemaNotificacao }): PayloadPush {
   const prefixo = c.tratamento ? `${c.tratamento}, ` : ""
+  let titulo: string
   let corpo: string
 
   if (c.totalHoje === 0) {
-    const frase = SEM_FLECAS[Math.abs(c.semente) % SEM_FLECAS.length]
-    // Com prefixo a frase começa em minúscula ("Cabo, você ainda não...")
-    corpo = c.tratamento ? `${prefixo}${frase.charAt(0).toLowerCase()}${frase.slice(1)}` : frase
+    titulo = `${prefixo}hora de pagar dez!`
+    corpo = SEM_FLECAS[Math.abs(c.semente) % SEM_FLECAS.length]
   } else if (c.recordeDiario > c.totalHoje) {
-    corpo = `${prefixo}hoje você já pagou ${c.totalHoje}. Faltam ${c.recordeDiario - c.totalHoje + 1} para bater o seu recorde diário.`
+    const faltam = c.recordeDiario - c.totalHoje + 1
+    titulo = `${prefixo}faltam ${faltam} para o recorde`
+    corpo = `Hoje você já pagou ${c.totalHoje}. Seu recorde diário é ${c.recordeDiario}.`
   } else {
-    corpo = `${prefixo}hoje você já pagou ${c.totalHoje}. Quer ir além?`
+    titulo = `${prefixo}hoje você já pagou ${c.totalHoje}`
+    corpo = "Esse é o seu melhor dia até agora. Quer ir além?"
   }
 
-  // Frase com prefixo no começo da mensagem precisa de inicial maiúscula
-  corpo = corpo.charAt(0).toUpperCase() + corpo.slice(1)
-  return { titulo: "Pague Dez", corpo, url: "/", tag: "lembrete-pague-dez" }
+  return {
+    titulo: capitalizar(titulo),
+    corpo,
+    url: "/",
+    tag: "lembrete-pague-dez",
+    imagem: IMAGEM_NOTIFICACAO[c.tema ?? "azul"],
+    acoes: ACOES_LEMBRETE,
+  }
 }
 
 /** "07:00, 19:30" → útil para resumir a agenda na tela. */

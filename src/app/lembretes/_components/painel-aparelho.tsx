@@ -9,6 +9,7 @@ import {
   ehIOS,
   inscreverNoPush,
   inscricaoAtual,
+  nomeDoNavegador,
   verificarSuporte,
   type SuporteApp,
 } from "@/lib/push-cliente"
@@ -19,6 +20,8 @@ type Estado = { suporte: SuporteApp; permissao: NotificationPermission | "indisp
 export function PainelAparelho({ configurado, chavePublica, aparelhosNaConta }: { configurado: boolean; chavePublica: string | null; aparelhosNaConta: number }) {
   const [estado, setEstado] = useState<Estado | null>(null)
   const [ocupado, setOcupado] = useState<"ativar" | "desativar" | "testar" | null>(null)
+  // Erro que fica na tela até a próxima tentativa (o aviso rápido sumia antes de dar para ler)
+  const [falha, setFalha] = useState<{ titulo: string; detalhe?: string } | null>(null)
 
   useEffect(() => {
     let cancelado = false
@@ -40,23 +43,30 @@ export function PainelAparelho({ configurado, chavePublica, aparelhosNaConta }: 
   const ativar = async () => {
     if (!chavePublica) return
     setOcupado("ativar")
+    setFalha(null)
     try {
       const r = await inscreverNoPush(chavePublica)
       if (!r.ok) {
         setEstado((e) => (e ? { ...e, permissao: Notification.permission } : e))
-        toast.error(
+        const titulo =
           r.motivo === "negada"
             ? "Permissão negada. Libere as notificações nas configurações do navegador para este site."
             : "Não foi possível ativar as notificações neste aparelho."
-        )
+        setFalha({ titulo, detalhe: `${nomeDoNavegador()} — etapa "${r.etapa}": ${r.detalhe}` })
+        toast.error(titulo, { duration: 8000 })
         return
       }
       const salvo = await salvarInscricaoAction(r.inscricao.toJSON())
-      if (salvo.erro) return void toast.error(salvo.erro)
+      if (salvo.erro) {
+        setFalha({ titulo: "O aparelho aceitou, mas o servidor não conseguiu salvar.", detalhe: `${nomeDoNavegador()} — ${salvo.erro}` })
+        return void toast.error(salvo.erro, { duration: 8000 })
+      }
       setEstado((e) => (e ? { ...e, permissao: "granted", inscrito: true } : e))
       toast.success("Notificações ativadas neste aparelho!")
-    } catch {
-      toast.error("Não foi possível ativar agora. Tente de novo.")
+    } catch (erro) {
+      console.error("Falha inesperada ao ativar:", erro)
+      setFalha({ titulo: "Não foi possível ativar agora.", detalhe: `${nomeDoNavegador()} — ${(erro as Error)?.message ?? String(erro)}` })
+      toast.error("Não foi possível ativar agora. Veja o detalhe na tela.", { duration: 8000 })
     } finally {
       setOcupado(null)
     }
@@ -79,11 +89,15 @@ export function PainelAparelho({ configurado, chavePublica, aparelhosNaConta }: 
   const testar = async () => {
     setOcupado("testar")
     try {
+      setFalha(null)
       const r = await enviarTesteAction()
-      if (r.erro) toast.error(r.erro)
-      else toast.success("Teste enviado! A notificação deve aparecer em instantes.")
-    } catch {
-      toast.error("Não foi possível enviar o teste agora.")
+      if (r.erro) {
+        setFalha({ titulo: r.erro })
+        toast.error(r.erro, { duration: 8000 })
+      } else toast.success("Teste enviado! A notificação deve aparecer em instantes.")
+    } catch (erro) {
+      console.error("Falha inesperada no teste:", erro)
+      setFalha({ titulo: "Não foi possível enviar o teste agora.", detalhe: (erro as Error)?.message })
     } finally {
       setOcupado(null)
     }
@@ -147,6 +161,13 @@ export function PainelAparelho({ configurado, chavePublica, aparelhosNaConta }: 
               </button>
             )}
           </div>
+
+          {falha && (
+            <div role="alert" className="rounded-[14px] border border-black bg-[var(--brasa)] p-3 text-sm text-white">
+              <p className="font-bold">{falha.titulo}</p>
+              {falha.detalhe && <p className="mt-1 break-words text-xs opacity-90">Detalhe técnico: {falha.detalhe}</p>}
+            </div>
+          )}
 
           {aparelhosNaConta > 0 && (
             <p className="text-xs text-[var(--texto-3)]">

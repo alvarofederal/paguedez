@@ -18,8 +18,13 @@ export async function salvarInscricaoAction(dados: unknown) {
   const v = inscricaoPushSchema.safeParse(dados)
   if (!v.success) return { erro: "Inscrição de notificação inválida." }
 
-  const agente = (await headers()).get("user-agent") ?? undefined
-  await salvarInscricao(user.id, v.data, agente)
+  try {
+    const agente = (await headers()).get("user-agent") ?? undefined
+    await salvarInscricao(user.id, v.data, agente)
+  } catch (erro) {
+    console.error("Falha ao salvar a inscrição de push:", erro)
+    return { erro: `Falha ao salvar no servidor: ${(erro as Error).message?.split("\n").pop() ?? "erro desconhecido"}` }
+  }
   revalidatePath("/lembretes")
   return { erro: null }
 }

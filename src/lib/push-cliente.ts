@@ -28,10 +28,29 @@ export function chaveParaUint8Array(base64Url: string): Uint8Array<ArrayBuffer> 
   return bytes
 }
 
+function comTempoLimite<T>(promessa: Promise<T>, ms: number, mensagem: string): Promise<T> {
+  return Promise.race([promessa, new Promise<never>((_, rejeitar) => setTimeout(() => rejeitar(new Error(mensagem)), ms))])
+}
+
 export async function registrarServiceWorker(): Promise<ServiceWorkerRegistration> {
   await navigator.serviceWorker.register("/sw.js", { scope: "/" })
-  return navigator.serviceWorker.ready
+  return comTempoLimite(navigator.serviceWorker.ready, 10_000, "O service worker não ficou ativo em 10 segundos")
 }
+
+/** Nome curto do navegador, só para o relatório de erro. */
+export function nomeDoNavegador(): string {
+  const ua = navigator.userAgent
+  if ((navigator as Navigator & { brave?: unknown }).brave) return "Brave"
+  if (ua.includes("Edg/")) return "Edge"
+  if (ua.includes("OPR/")) return "Opera"
+  if (ua.includes("Firefox/")) return "Firefox"
+  if (ua.includes("SamsungBrowser")) return "Samsung Internet"
+  if (ua.includes("Chrome/")) return "Chrome"
+  if (ua.includes("Safari/")) return "Safari"
+  return "navegador desconhecido"
+}
+
+export type FalhaInscricao = { ok: false; motivo: "negada" | "falhou"; etapa?: string; detalhe?: string }
 
 export async function inscricaoAtual(): Promise<PushSubscription | null> {
   if (!("serviceWorker" in navigator)) return null
@@ -40,18 +59,24 @@ export async function inscricaoAtual(): Promise<PushSubscription | null> {
 }
 
 /** Pede permissão (precisa estar dentro de um clique) e cria a inscrição de push deste aparelho. */
-export async function inscreverNoPush(chavePublica: string): Promise<{ ok: true; inscricao: PushSubscription } | { ok: false; motivo: "negada" | "falhou" }> {
-  const permissao = await Notification.requestPermission()
-  if (permissao !== "granted") return { ok: false, motivo: "negada" }
+export async function inscreverNoPush(chavePublica: string): Promise<{ ok: true; inscricao: PushSubscription } | FalhaInscricao> {
+  let etapa = "pedir permissão"
   try {
+    const permissao = await Notification.requestPermission()
+    if (permissao !== "granted") return { ok: false, motivo: "negada", etapa, detalhe: `resposta do navegador: ${permissao}` }
+
+    etapa = "registrar o service worker"
     const registro = await registrarServiceWorker()
+
+    etapa = "criar a inscrição no serviço de push do navegador"
     const existente = await registro.pushManager.getSubscription()
     const inscricao =
       existente ?? (await registro.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: chaveParaUint8Array(chavePublica) }))
     return { ok: true, inscricao }
   } catch (erro) {
-    console.error("Falha ao criar a inscrição de push:", erro)
-    return { ok: false, motivo: "falhou" }
+    console.error(`Falha ao ativar o push (etapa: ${etapa}):`, erro)
+    const e = erro as Error
+    return { ok: false, motivo: "falhou", etapa, detalhe: `${e?.name ?? "Erro"}: ${e?.message ?? String(erro)}` }
   }
 }
 

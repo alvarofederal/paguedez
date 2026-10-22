@@ -1,11 +1,13 @@
 import Link from "next/link"
-import { Bell, Send, Swords } from "lucide-react"
+import { Send, Swords } from "lucide-react"
 import { usuarioAtual } from "@/lib/auth"
 import { socialAtivo } from "@/lib/social-flag"
 import { painelDoDia } from "@/server/flexoes"
 import { listarMinhasComunidades } from "@/server/comunidades"
 import { sincronizarPatente } from "@/server/patentes"
-import { contarLembretesAtivos } from "@/server/lembretes"
+import { listarLembretes } from "@/server/lembretes"
+import { contarInscricoes } from "@/server/push"
+import { LembretesCard } from "@/components/lembretes-card"
 import { PatenteCard } from "@/components/patente-card"
 import { PromocaoPatente } from "@/components/promocao-patente"
 import { AppShell } from "@/components/app-shell"
@@ -23,7 +25,7 @@ export default async function InicioPage() {
   if (!usuario) return <Landing /> // visitante: landing page pública
 
   const social = socialAtivo()
-  const [{ resumo, seriesHoje, ultimaTaca }, pelotoes, patente, lembretesAtivos] = await Promise.all([
+  const [{ resumo, seriesHoje, ultimaTaca }, pelotoes, patente, lembretes, aparelhos] = await Promise.all([
     painelDoDia(usuario.id),
     social ? listarMinhasComunidades(usuario.id) : Promise.resolve([]),
     // A patente é um extra: se falhar, a tela principal continua funcionando normalmente
@@ -31,9 +33,11 @@ export default async function InicioPage() {
       console.error("Falha ao sincronizar a patente:", erro)
       return null
     }),
-    // Também é um extra: se falhar, o card simplesmente não aparece
-    contarLembretesAtivos(usuario.id).catch(() => null),
+    // Lembretes também são um extra: se falharem, o card simplesmente não aparece
+    listarLembretes(usuario.id).catch(() => null),
+    contarInscricoes(usuario.id).catch(() => null),
   ])
+  const horariosAtivos = lembretes?.filter((l) => l.ativo).map((l) => l.hora) ?? []
   // Comemora só a maior patente conquistada AGORA (Recruta, a inicial, não tem festa)
   const promovido = patente?.novas.filter((p) => p.patente !== "RECRUTA").at(-1)
 
@@ -47,17 +51,7 @@ export default async function InicioPage() {
 
       {patente && <PatenteCard atual={patente.atual} progresso={patente.progresso} />}
 
-      {lembretesAtivos === 0 && (
-        <section className="mt-4 flex flex-col gap-3 rounded-[20px] border border-black bg-[var(--menta)] p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="display text-2xl">Lembrete diário</p>
-            <p className="text-sm font-medium">Receba uma notificação na hora de pagar suas flecas, mesmo com o app fechado.</p>
-          </div>
-          <Link href="/lembretes" className="pilula pilula-cheia shrink-0">
-            <Bell className="h-4 w-4" /> Ativar lembrete
-          </Link>
-        </section>
-      )}
+      {lembretes !== null && aparelhos !== null && <LembretesCard horarios={horariosAtivos} aparelhos={aparelhos} />}
       {promovido && <PromocaoPatente patente={promovido.patente} titulo={promovido.titulo} lema={promovido.lema} />}
 
       {socialAtivo() && (
@@ -102,16 +96,6 @@ export default async function InicioPage() {
       )}
 
       <SeriesHoje series={seriesHoje} />
-
-      {lembretesAtivos !== null && lembretesAtivos > 0 && (
-        <p className="mt-4 text-center text-sm">
-          <Bell className="mr-1 inline h-3.5 w-3.5" />
-          {lembretesAtivos} {lembretesAtivos === 1 ? "lembrete ativo" : "lembretes ativos"} ·{" "}
-          <Link href="/lembretes" className="font-bold underline underline-offset-4">
-            gerenciar
-          </Link>
-        </p>
-      )}
     </AppShell>
   )
 }

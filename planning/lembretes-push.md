@@ -6,7 +6,8 @@
 ## O que o usuário vê
 - **`/lembretes`**: "Este aparelho" (ativar, desativar, **enviar notificação de teste**) e "Sua agenda" (até 10 lembretes, cada um com horário, dias da semana,
   interruptor e a opção "só avisar se eu ainda não paguei flecas hoje").
-- **Tela Pagar**: card "Lembrete diário" para quem ainda não tem nenhum; depois, uma linha discreta "N lembretes ativos · gerenciar".
+- **Tela Pagar**: card fixo (`src/components/lembretes-card.tsx`) que muda conforme o passo: sem nada configurado ("Lembrete diário"), horários criados sem aparelho ativo ("Falta ativar o aparelho", em vermelho), aparelho ativo sem horários ("Escolha um horário") e tudo certo ("Lembretes ativos", com os horários e o botão "Gerenciar lembretes").
+- **Topo de todas as telas**: sino com selo — número de lembretes ativos, ou "!" em vermelho quando há horários mas nenhum aparelho recebe. No celular só o ícone; a partir de `sm` aparece o texto "Lembretes".
 - **Landing**: seção "Lembrete no celular", com a ressalva do iPhone.
 - A notificação traz o tratamento pela patente ("Cabo, você ainda não pagou nenhuma fleca hoje...") e abre o app ao ser tocada.
 
